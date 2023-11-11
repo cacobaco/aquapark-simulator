@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "writer.h": "c",
+        "stream.h": "c",
+        "stdlib.h": "c",
+        "assert.h": "c",
+        "rapidjson.h": "c",
+        "cjson.h": "c",
+        "stdio.h": "c",
+        "sstream": "c",
+        "regex": "c",
+        "typeinfo": "c",
+        "simulador.h": "c",
+        "structs.h": "c",
+        "socket.h": "c"
+    }
+}

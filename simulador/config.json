@@ -1,0 +1,31 @@
+{
+    "tempo_medio_chegada": 99,
+    "prob_desistencia": 20,
+    "tempo_simulacao": 600,
+    "espacos": [
+        {
+            "nome": "cabanas",
+            "lotacao": 20,
+            "minimo": 20,
+            "cargo": "vip"
+        },
+        {
+            "nome": "corrida",
+            "lotacao": 80,
+            "minimo": 4
+        },
+        {
+            "nome": "rio_lento",
+            "lotacao": 200
+        },
+        {
+            "nome": "piscina_adultos",
+            "lotacao": 100
+        },
+        {
+            "nome": "piscina_criancas",
+            "lotacao": 50,
+            "cargo": "cargo"
+        }
+    ]
+}
