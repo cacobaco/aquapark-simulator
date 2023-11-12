@@ -5,7 +5,7 @@
 #include "cJSON.h"
 #include "structs.h"
 
-struct Config *config = NULL;
+Config *config = NULL;
 
 void loadConfig()
 {
@@ -62,7 +62,7 @@ void loadConfig()
     }
 
     int numeroEspacos = cJSON_GetArraySize(espacosJson);
-    struct Espaco *espacos = malloc(numeroEspacos * sizeof(struct Espaco));
+    Espaco *espacos = malloc(numeroEspacos * sizeof(Espaco));
 
     int i = 0;
     cJSON *espacoJson = NULL;
@@ -101,7 +101,7 @@ void loadConfig()
         i++;
     }
 
-    config = malloc(sizeof(struct Config));
+    config = malloc(sizeof(Config));
     config->tempoMedioChegada = tempoMedioChegada->valueint;
     config->probDesistencia = probDesistencia->valueint;
     config->tempoSimulacao = tempoSimulacao->valueint;
@@ -118,7 +118,7 @@ void printConfig()
 
     for (int i = 0; i < config->numeroEspacos; i++)
     {
-        struct Espaco *espaco = &(config->espacos[i]);
+        Espaco *espaco = &(config->espacos[i]);
 
         printf("Espaço %i:\n", i + 1);
         printf("\tNome: %s\n", espaco->nome);

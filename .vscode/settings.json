@@ -12,6 +12,10 @@
         "typeinfo": "c",
         "simulador.h": "c",
         "structs.h": "c",
-        "socket.h": "c"
+        "socket.h": "c",
+        "config.h": "c",
+        "pthread.h": "c",
+        "struct_timespec.h": "c",
+        "unistd.h": "c"
     }
 }

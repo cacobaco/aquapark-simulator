@@ -1,16 +1,23 @@
-struct Espaco
+typedef struct
 {
     const char *nome;
     int lotacao;
     int minimo;
     const char *cargo;
-};
+} Espaco;
 
-struct Config
+typedef struct
 {
     int tempoMedioChegada;
     int probDesistencia;
     int tempoSimulacao;
     int numeroEspacos;
-    struct Espaco *espacos;
-};
+    Espaco *espacos;
+} Config;
+
+typedef struct // jony
+{
+    int id;
+    char *atracoesVisitadas[4];
+    const char *cargo;
+} Utilizador;
