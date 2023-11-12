@@ -2,7 +2,7 @@
 #define UNIXDG_PATH "/tmp/s.projeto2dg"
 #define UNIXDG_TMP "/tmp/dg2080021"
 
-int sock_fd, sock_monitor_fd;
+int sock_fd;
 
 void openSocket();
 void closeSocket();

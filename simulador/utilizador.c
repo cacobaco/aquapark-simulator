@@ -2,8 +2,13 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include "utilizador.h"
 #include "structs.h"
+#include "socket.h"
+#include "util.h"
+
+#define MAX_LINE 512
 
 pthread_t utilizadores[LOTACAO];
 pthread_mutex_t mutex;
@@ -41,7 +46,9 @@ void *comportamentoUtilizador(void *arg)
         int chanceSair = rand() % 100;
         if (chanceSair < 2)
         {
-            printf("Utilizador %d saiu no parque.\n\n", utilizador->id);
+            char *buf = malloc(MAX_LINE);
+            snprintf(buf, MAX_LINE, "Utilizador %i saiu do parque.\n\n", utilizador->id);
+            writen(sock_monitor_fd, buf, strlen(buf));
             utilizadores[utilizador->id - 1] = 0;
             pthread_exit(NULL);
         }
@@ -51,7 +58,7 @@ void *comportamentoUtilizador(void *arg)
     }
 }
 
-void *criaUtilizador(int id, int arg2)
+void *criaUtilizador(int id, int numUtilizadores)
 {
     // pthread_mutex_lock(&mutex);
     // pthread_cond_wait(&condicaoCriacao, &mutex);
@@ -70,10 +77,7 @@ void *criaUtilizador(int id, int arg2)
     }
 
     pthread_create(&utilizadores[id - 1], NULL, comportamentoUtilizador, (void *)utilizador);
-    printf("Utilizador %d de cargo %s entrou no parque.\n", utilizador->id, utilizador->cargo);
-    printf("Estão %d utilizadores no parque.\n", arg2 + 1);
-    printf("Tempo médio de chegada:\n");
-    printf("Tempo médio de saida:\n\n");
-
-    // pthread_mutex_unlock(&mutex);
+    char *buf = malloc(MAX_LINE);
+    snprintf(buf, MAX_LINE, "Utilizador %d de cargo %s entrou no parque.\nEstão %i utilizadores no parque.\n\n", utilizador->id, utilizador->cargo, numUtilizadores + 1);
+    writen(sock_monitor_fd, buf, strlen(buf));
 }

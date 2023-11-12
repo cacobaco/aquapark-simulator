@@ -1,14 +1,18 @@
-#include "socket.h"
-#include <sys/un.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/un.h>
+#include "socket.h"
+#include "util.h"
 
-void createSocket()
+void openSocket()
 {
-    int sockfd, newsockfd, clilen, childpid, servlen;
+    int clilen, childpid, servlen;
     struct sockaddr_un cli_addr, serv_addr;
 
-    if ((sockfd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
-        err_dump("server: can't open stream socket");
+    if ((sock_fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
+        printf("server: can't open stream socket\n");
 
     bzero((char *)&serv_addr, sizeof(serv_addr)); // limpeza preventiva
     serv_addr.sun_family = AF_UNIX;
@@ -16,36 +20,27 @@ void createSocket()
 
     servlen = strlen(serv_addr.sun_path) + sizeof(serv_addr.sun_family);
     unlink(UNIXSTR_PATH);
-    if (bind(sockfd, (struct sockaddr *)&serv_addr, servlen) < 0)
-        err_dump("server, can't bind local address");
 
-    listen(sockfd, 1); // aceita 1 cliente de uma só vez
+    if (bind(sock_fd, (struct sockaddr *)&serv_addr, servlen) < 0)
+        printf("server, can't bind local address\n");
 
-    for (;;)
+    listen(sock_fd, 1); // aceita 1 cliente
+
+    clilen = sizeof(cli_addr);
+
+    printf("Aguardando conecxão do monitor...\n");
+    sock_monitor_fd = accept(sock_fd, (struct sockaddr *)&cli_addr, &clilen);
+
+    if (sock_monitor_fd < 0)
     {
-        clilen = sizeof(cli_addr);
-        newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
-        if (newsockfd < 0)
-            err_dump("server: accept error");
-
-        if ((childpid = fork()) < 0) // processo filho lida com o cliente
-        {
-            err_dump("server: fork error");
-        }
-        else if (childpid == 0)
-        {
-            // processo filho
-
-            close(sockfd); // sockfd não é usado pelo filho
-            str_echo(newsockfd);
-            exit(0);
-        }
-
-        // newsockfd não é usado pelo pai
-        close(newsockfd);
+        printf("server: accept error\n");
     }
+    printf("Monitor conectado, simulação iniciada.\n");
 }
 
 void closeSocket()
 {
+    printf("Terminando conecxão com monitor.\n");
+    close(sock_monitor_fd);
+    close(sock_fd);
 }

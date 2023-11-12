@@ -2,4 +2,4 @@
 
 void loadConfig();
 void printConfig();
-void freeMemory();
+void freeConfig();

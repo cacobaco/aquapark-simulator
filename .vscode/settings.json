@@ -16,6 +16,8 @@
         "config.h": "c",
         "pthread.h": "c",
         "struct_timespec.h": "c",
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "utilizador.h": "c",
+        "util.h": "c"
     }
 }

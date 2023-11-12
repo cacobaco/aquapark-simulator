@@ -2,15 +2,24 @@
 #include <string.h>
 #include <time.h>
 #include <signal.h>
+#include "socket.h"
 
 #define REPORT_FILE "report.txt"
 
 int stop = 0;
 
+void gerarRelatorio();
 char *getReportDateTime();
 void catchSIGINT();
 
 int main(int argc, char const *argv[])
+{
+    openSocket();
+    closeSocket();
+    return 0;
+}
+
+void gerarRelatorio()
 {
     FILE *f = fopen(REPORT_FILE, "a");
 
@@ -38,7 +47,6 @@ int main(int argc, char const *argv[])
 
     fputs(getReportDateTime(), f);
     fclose(f);
-    return 0;
 }
 
 /* Returns current date and time for report. */

@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "config.h"
-#include "cJSON.h"
 #include "structs.h"
+#include "cJSON.h"
 
 Config *config = NULL;
 
@@ -128,7 +128,7 @@ void printConfig()
     }
 }
 
-void freeMemory()
+void freeConfig()
 {
     free(config->espacos);
     free(config);
