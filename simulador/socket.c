@@ -2,8 +2,6 @@
 #include <sys/un.h>
 #include <sys/socket.h>
 
-int
-
 void createSocket()
 {
     int sockfd, newsockfd, clilen, childpid, servlen;
@@ -26,36 +24,28 @@ void createSocket()
     for (;;)
     {
         clilen = sizeof(cli_addr);
-        newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr,
-                           &clilen);
+        newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
         if (newsockfd < 0)
             err_dump("server: accept error");
 
         if ((childpid = fork()) < 0) // processo filho lida com o cliente
+        {
             err_dump("server: fork error");
-
+        }
         else if (childpid == 0)
         {
-            /* Processo filho que vai atender o cliente.
-               Fechar sockfd é sanitário, já que não é
-               utilizado pelo processo filho.
-               Os dados recebidos do cliente são reenviados
-               para o cliente */
+            // processo filho
 
-            close(sockfd);
+            close(sockfd); // sockfd não é usado pelo filho
             str_echo(newsockfd);
             exit(0);
         }
 
-        /* Processo pai.
-           Fechar newsockfd é sanitário, já que não é
-           utilizado pelo processo pai */
-
+        // newsockfd não é usado pelo pai
         close(newsockfd);
     }
 }
 
 void closeSocket()
 {
-
 }
