@@ -5,8 +5,6 @@
 #include "utilizador.h"
 #include "structs.h"
 
-#define LOTACAO 100
-
 pthread_t utilizadores[LOTACAO];
 pthread_mutex_t mutex;
 pthread_cond_t condicaoCriacao;
@@ -44,7 +42,7 @@ void *comportamentoUtilizador(void *arg)
         if (chanceSair < 2)
         {
             printf("Utilizador %d saiu no parque.\n\n", utilizador->id);
-            utilizadores[utilizador->id] = 0;
+            utilizadores[utilizador->id - 1] = 0;
             pthread_exit(NULL);
         }
         sleep(1);
