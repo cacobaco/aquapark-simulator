@@ -1,68 +1,99 @@
 #include <stdio.h>
-#include <string.h>
-#include <time.h>
-#include <signal.h>
-#include "socket.h"
+#include <stdlib.h>
+#include "socket_server.h"
 
-#define REPORT_FILE "report.txt"
+#define LOG_FILE "report.txt"
 
-int stop = 0;
+// void gerarRelatorio();
+// char *getReportDateTime();
+// void catchSIGINT();
 
-void gerarRelatorio();
-char *getReportDateTime();
-void catchSIGINT();
+void openMenu();
 
-int main(int argc, char const *argv[])
+void main(int argc, char const *argv[])
 {
-    openSocket();
-    closeSocket();
-    return 0;
+    openMenu();
+    exit(0);
 }
 
-void gerarRelatorio()
+void openMenu()
 {
-    FILE *f = fopen(REPORT_FILE, "a");
+    int option = -1;
 
-    if (f == NULL)
+    while (option != 0)
     {
-        printf("%s", "Ocorreu um erro ao abrir o ficheiro de relatório.\n");
-        return 1;
-    }
+        printf("-------- Menu --------\n");
+        printf("1 - Iniciar simulação\n");
+        printf("0 - Fechar aplicação\n");
+        printf("Escolha uma opção: ");
 
-    fputs(getReportDateTime(), f);
+        scanf("%d", &option);
 
-    printf("%s", "Introduza texto para o relatório.\n");
+        printf("\n");
 
-    signal(SIGINT, catchSIGINT);
-
-    char line[100];
-
-    while (!stop && fgets(line, sizeof line, stdin))
-    {
-        if (strcmp(line, "\n"))
+        switch (option)
         {
-            fputs(line, f);
+        case 0:
+            printf("A fechar aplicação...\n");
+            exit(0);
+            break;
+        case 1:
+            openSocket();
+            closeSocket();
+            break;
+        default:
+            printf("Opção inválida.\n");
+            break;
         }
+
+        printf("\n");
     }
-
-    fputs(getReportDateTime(), f);
-    fclose(f);
 }
 
-/* Returns current date and time for report. */
-char *getReportDateTime()
-{
-    time_t t = time(NULL);
+// void gerarRelatorio()
+// {
+//     FILE *f = fopen(REPORT_FILE, "a");
 
-    if (t == -1)
-    {
-        return "[error]\n";
-    }
+//     if (f == NULL)
+//     {
+//         printf("%s", "Ocorreu um erro ao abrir o ficheiro de relatório.\n");
+//         return 1;
+//     }
 
-    return ctime(&t);
-}
+//     fputs(getReportDateTime(), f);
 
-void catchSIGINT()
-{
-    stop = 1;
-}
+//     printf("%s", "Introduza texto para o relatório.\n");
+
+//     signal(SIGINT, catchSIGINT);
+
+//     char line[100];
+
+//     while (!stop && fgets(line, sizeof line, stdin))
+//     {
+//         if (strcmp(line, "\n"))
+//         {
+//             fputs(line, f);
+//         }
+//     }
+
+//     fputs(getReportDateTime(), f);
+//     fclose(f);
+// }
+
+// /* Returns current date and time for report. */
+// char *getReportDateTime()
+// {
+//     time_t t = time(NULL);
+
+//     if (t == -1)
+//     {
+//         return "[error]\n";
+//     }
+
+//     return ctime(&t);
+// }
+
+// void catchSIGINT()
+// {
+//     stop = 1;
+// }

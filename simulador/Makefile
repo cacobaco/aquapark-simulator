@@ -1,3 +1,8 @@
+build: simulador
+
+clean:
+	rm -f *.o
+
 simulador: simulador.o config.o socket.o utilizador.o util.o cJSON.o
 	gcc -g simulador.o config.o socket.o utilizador.o util.o cJSON.o -lpthread -o simulador
 
@@ -18,6 +23,3 @@ util.o: util.c util.h
 
 cJSON.o: cJSON.c cJSON.h
 	gcc -g -c cJSON.c
-
-clean:
-	rm -f *.o

@@ -18,6 +18,10 @@
         "struct_timespec.h": "c",
         "unistd.h": "c",
         "utilizador.h": "c",
-        "util.h": "c"
+        "util.h": "c",
+        "socket_server.h": "c",
+        "un.h": "c",
+        "features.h": "c",
+        "types.h": "c"
     }
 }
