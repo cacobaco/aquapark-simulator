@@ -1,16 +1,19 @@
+#ifndef STRUCTS_H
+#define STRUCTS_H
+
 typedef struct
 {
     const char *nome;
-    int lotacao;
-    int minimo;
-    const char *cargo;
+    int lotacaoMaxima;
+    // const char *cargo;
 } Espaco;
 
 typedef struct
 {
-    int tempoMedioChegada;
-    int probDesistencia;
     int tempoSimulacao;
+    int tempoMedioChegada;
+    float probDesistencia;
+    float probSaida;
     int numeroEspacos;
     Espaco *espacos;
 } Config;
@@ -18,6 +21,7 @@ typedef struct
 typedef struct // jony
 {
     int id;
-    char *atracoesVisitadas[4];
-    const char *cargo;
+    // const char *cargo;
 } Utilizador;
+
+#endif
