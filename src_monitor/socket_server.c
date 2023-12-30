@@ -7,8 +7,6 @@
 #include "socket_server.h"
 #include "util.h"
 
-#define MAX_LEN 512
-
 int sock_fd, sock_simulador_fd;
 
 void openSocket()
@@ -45,15 +43,7 @@ void openSocket()
 
     clilen = sizeof(cli_addr);
 
-    if (fork() == 0)
-    {
-        printf("teste");
-        return;
-    }
-    else
-    {
-        printf("teste2");
-    }
+    // TODO lançar simulador
 
     printf("Simulador aberto, aguardando conecxão do simulador...\n");
 

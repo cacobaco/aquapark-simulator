@@ -3,8 +3,8 @@ build: simulador
 clean:
 	rm -f *.o
 
-simulador: simulador.o config.o socket_client.o util.o cJSON.o
-	gcc -g simulador.o config.o socket_client.o util.o cJSON.o -lpthread -o simulador
+simulador: simulador.o config.o socket_client.o utilizador.o util.o cJSON.o
+	gcc -g simulador.o config.o socket_client.o utilizador.o util.o cJSON.o -lpthread -o simulador
 
 simulador.o: simulador.c config.h socket_client.h
 	gcc -g -c simulador.c
@@ -14,6 +14,9 @@ config.o: config.c config.h structs.h cJSON.h
 
 socket_client.o: socket_client.c socket_client.h util.h
 	gcc -g -c socket_client.c
+
+utilizador.o: utilizador.c utilizador.h structs.h config.h socket_client.h util.h
+	gcc -g -c utilizador.c
 
 util.o: util.c util.h
 	gcc -g -c util.c

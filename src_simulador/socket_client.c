@@ -7,8 +7,6 @@
 #include "socket_client.h"
 #include "util.h"
 
-#define MAX_LINE 512
-
 int sock_fd;
 
 void openSocket()

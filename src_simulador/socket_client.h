@@ -4,6 +4,7 @@
 #define UNIXSTR_PATH "/tmp/s.projeto2str"
 #define UNIXDG_PATH "/tmp/s.projeto2dg"
 #define UNIXDG_TMP "/tmp/dg2080021"
+#define MAX_LEN 512
 
 extern int sock_fd;
 

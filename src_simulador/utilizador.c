@@ -5,79 +5,60 @@
 #include <string.h>
 #include "utilizador.h"
 #include "structs.h"
+#include "config.h"
 #include "socket_client.h"
 #include "util.h"
 
-#define MAX_LINE 512
+void entraEspaco(Utilizador *utilizador);
 
-pthread_t utilizadores[LOTACAO];
-pthread_mutex_t mutex;
-pthread_cond_t condicaoCriacao;
-
-// jony
-void entraParque()
+void comportamentoUtilizador(void *arg)
 {
-    srand(time(NULL)); // gerar seed "aleatória"
+    Utilizador *utilizador = (Utilizador *)arg;
 
-    int id = 0;
     while (1)
     {
-        int numUtilizadores = 0;
-        for (int i = 0; i < LOTACAO; i++)
+        entraEspaco(utilizador);
+        sleep(1);
+    }
+}
+
+// jony
+void entraEspaco(Utilizador *utilizador)
+{
+    // TODO entrar num espaco conforme os visitados anteriormente
+    char buf[MAX_LEN];
+    int randomEspaco = rand() % config->numeroEspacos;
+    Espaco *espaco = &(config->espacos[randomEspaco]);
+
+    if (espaco->numUtilizadores < espaco->lotacaoMaxima) // TODO adicionar trinco/semaforo
+    {
+        espaco->numUtilizadores++;
+
+        snprintf(buf, MAX_LEN, "Utilizador %i entrou no espaco %s.\n\n", utilizador->id, espaco->nome);
+        writen(sock_fd, buf, strlen(buf));
+
+        int sair = 0;
+
+        while (!sair)
         {
-            if (utilizadores[i] != 0)
+            sleep(1);
+
+            double random = rand() / (double)RAND_MAX;
+
+            if (random <= config->probSaidaEspaco)
             {
-                numUtilizadores++;
+                break;
             }
         }
 
-        criaUtilizador(++id, numUtilizadores);
-        int espera = rand() % 10;
-        sleep(espera);
-    }
-}
+        espaco->numUtilizadores--;
 
-void *comportamentoUtilizador(void *arg)
-{
-    Utilizador *utilizador = (Utilizador *)arg;
-    while (1)
-    {
-        // pthread_mutex_lock(&mutex);
-        int chanceSair = rand() % 100;
-        if (chanceSair < 2)
-        {
-            char *buf = malloc(MAX_LINE);
-            snprintf(buf, MAX_LINE, "Utilizador %i saiu do parque.\n\n", utilizador->id);
-            writen(sock_monitor_fd, buf, strlen(buf));
-            utilizadores[utilizador->id - 1] = 0;
-            pthread_exit(NULL);
-        }
-        sleep(1);
-        // pthread_cond_signal(&condicaoCriacao);
-        // pthread_mutex_unlock(&mutex);
-    }
-}
-
-void *criaUtilizador(int id, int numUtilizadores)
-{
-    // pthread_mutex_lock(&mutex);
-    // pthread_cond_wait(&condicaoCriacao, &mutex);
-    Utilizador *utilizador = malloc(sizeof(Utilizador));
-
-    utilizador->id = id;
-
-    int chance = rand() % 100;
-    if (chance < 10)
-    {
-        utilizador->cargo = "VIP";
+        snprintf(buf, MAX_LEN, "Utilizador %i saiu do espaco %s.\n\n", utilizador->id, espaco->nome);
+        writen(sock_fd, buf, strlen(buf));
     }
     else
     {
-        utilizador->cargo = "Normal";
+        snprintf(buf, MAX_LEN, "Utilizador %i não entrou no espaco %s porque está cheio.\n\n", utilizador->id, espaco->nome);
+        writen(sock_fd, buf, strlen(buf));
     }
-
-    pthread_create(&utilizadores[id - 1], NULL, comportamentoUtilizador, (void *)utilizador);
-    char *buf = malloc(MAX_LINE);
-    snprintf(buf, MAX_LINE, "Utilizador %d de cargo %s entrou no parque.\nEstão %i utilizadores no parque.\n\n", utilizador->id, utilizador->cargo, numUtilizadores + 1);
-    writen(sock_monitor_fd, buf, strlen(buf));
 }

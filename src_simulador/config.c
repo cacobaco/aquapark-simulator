@@ -29,35 +29,49 @@ void loadConfig()
     cJSON *json = cJSON_Parse(fcontent);
     if (json == NULL)
     {
-        printf("Ocorreu um erro ao carregar o json da configuração.\n");
+        printf("Ocorreu um erro ao carregar a configuração.\n");
         exit(1);
     }
 
     cJSON *tempoSimulacao = cJSON_GetObjectItemCaseSensitive(json, "tempo_simulacao");
     if (!cJSON_IsNumber(tempoSimulacao))
     {
-        printf("Ocorreu um erro ao carregar o tempo de simulação da configuração.\n");
+        printf("Ocorreu um erro ao carregar tempo_simulacao.\n");
         exit(1);
     }
 
     cJSON *tempoMedioChegada = cJSON_GetObjectItemCaseSensitive(json, "tempo_medio_chegada");
     if (!cJSON_IsNumber(tempoMedioChegada))
     {
-        printf("Ocorreu um erro ao carregar o tempo de chegada da configuração.\n");
+        printf("Ocorreu um erro ao carregar tempo_medio_chegada.\n");
         exit(1);
     }
 
-    cJSON *probDesistencia = cJSON_GetObjectItemCaseSensitive(json, "prob_desistencia");
-    if (!cJSON_IsNumber(probDesistencia))
+    cJSON *probEntradaEspaco = cJSON_GetObjectItemCaseSensitive(json, "prob_entrada_espaco");
+    if (!cJSON_IsNumber(probEntradaEspaco))
     {
-        printf("Ocorreu um erro ao carregar a probabilidade de desistência da configuração.\n");
+        printf("Ocorreu um erro ao carregar prob_entrada_espaco.\n");
         exit(1);
     }
 
-    cJSON *probSaida = cJSON_GetObjectItemCaseSensitive(json, "prob_saida");
-    if (!cJSON_IsNumber(probDesistencia))
+    cJSON *probSaidaEspaco = cJSON_GetObjectItemCaseSensitive(json, "prob_saida_espaco");
+    if (!cJSON_IsNumber(probSaidaEspaco))
     {
-        printf("Ocorreu um erro ao carregar a probabilidade de desistência da configuração.\n");
+        printf("Ocorreu um erro ao carregar prob_saida_espaco.\n");
+        exit(1);
+    }
+
+    cJSON *probSaidaParque = cJSON_GetObjectItemCaseSensitive(json, "prob_saida_parque");
+    if (!cJSON_IsNumber(probSaidaParque))
+    {
+        printf("Ocorreu um erro ao carregar prob_saida_parque.\n");
+        exit(1);
+    }
+
+    cJSON *lotacaoMaxima = cJSON_GetObjectItemCaseSensitive(json, "lotacao_maxima");
+    if (!cJSON_IsNumber(lotacaoMaxima))
+    {
+        printf("Ocorreu um erro ao carregar lotacao_maxima.\n");
         exit(1);
     }
 
@@ -105,8 +119,11 @@ void loadConfig()
     config = malloc(sizeof(Config));
     config->tempoSimulacao = tempoSimulacao->valueint;
     config->tempoMedioChegada = tempoMedioChegada->valueint;
-    config->probDesistencia = probDesistencia->valuedouble;
-    config->probSaida = probSaida->valuedouble;
+    config->probEntradaEspaco = probEntradaEspaco->valuedouble;
+    config->probSaidaEspaco = probSaidaEspaco->valuedouble;
+    config->probSaidaParque = probSaidaParque->valuedouble;
+    config->lotacaoMaxima = lotacaoMaxima->valueint;
+    config->utilizadores = malloc(config->lotacaoMaxima * sizeof(pthread_t));
     config->numeroEspacos = numeroEspacos;
     config->espacos = espacos;
 }
@@ -115,8 +132,10 @@ void printConfig()
 {
     printf("Tempo de simulação: %i\n", config->tempoSimulacao);
     printf("Tempo médio de chegada: %i\n", config->tempoMedioChegada);
-    printf("Probabilidade de desistência: %f\n", config->probDesistencia);
-    printf("Probabilidade de saída: %f\n", config->probSaida);
+    printf("Probabilidade de entrada no espaço: %f\n", config->probEntradaEspaco);
+    printf("Probabilidade de saída do espaço: %f\n", config->probSaidaEspaco);
+    printf("Probabilidade de saída do parque: %f\n", config->probSaidaParque);
+    printf("Lotação máxima do parque: %f\n", config->lotacaoMaxima);
     printf("Número de espaços: %i\n", config->numeroEspacos);
 
     for (int i = 0; i < config->numeroEspacos; i++)

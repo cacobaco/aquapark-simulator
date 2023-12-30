@@ -2,9 +2,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
+#include <pthread.h>
 #include "config.h"
 #include "socket_client.h"
-// #include "utilizador.h"
+#include "utilizador.h"
+
+int userId = 0;
+
+void criarUtilizador();
 
 void main(int argc, char const *argv[])
 {
@@ -16,32 +21,37 @@ void main(int argc, char const *argv[])
     int tempoTotal = 0;
     int tempoEsperado = 0;
 
-    printConfig();
-
     while (tempoTotal < config->tempoSimulacao)
     {
-        double chance = tempoEsperado / (double)config->tempoMedioChegada;
-        double random = rand() / (double)RAND_MAX;
-
-        printf("tempoEsperado: %d\n", tempoEsperado);
-        printf("chance: %f\n", chance);
-        printf("random: %f\n", random);
-
-        if (random <= chance)
-        {
-            printf("novo user\n");
-            tempoEsperado = 0;
-        }
-
         sleep(1);
         tempoTotal++;
         tempoEsperado++;
-    }
 
-    fputs("Fim da simulação.\n", stdout);
-    fclose(stdout);
+        double probabilidade = tempoEsperado / (double)config->tempoMedioChegada;
+        double random = rand() / (double)RAND_MAX;
+
+        if (random <= probabilidade)
+        {
+            criaUtilizador();
+            tempoEsperado = 0;
+        }
+    }
 
     closeSocket();
     freeConfig();
     exit(0);
+}
+
+void criarUtilizador()
+{
+    // TODO implementar semaforo/trinco, id critico
+    userId++;
+    Utilizador *utilizador = malloc(sizeof(Utilizador));
+    utilizador->id = userId;
+
+    pthread_create(config->utilizadores[utilizador->id], NULL, comportamentoUtilizador, (void *)utilizador);
+
+    char *buf = malloc(MAX_LEN);
+    snprintf(buf, MAX_LEN, "Utilizador %d entrou no parque.\n\n", utilizador->id);
+    writen(sock_fd, buf, strlen(buf));
 }

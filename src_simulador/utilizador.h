@@ -1,10 +1,9 @@
 #ifndef UTILIZADOR_H
 #define UTILIZADOR_H
 
-#define LOTACAO 100
+#include "structs.h"
 
-void entraParque();
-void *comportamentoUtilizador(void *arg);
-void *criaUtilizador(int id, int numUtilizadores);
+void comportamentoUtilizador(void *arg);
+void entraEspaco(Utilizador *utilizador);
 
 #endif
