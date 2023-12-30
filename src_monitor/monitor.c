@@ -39,7 +39,6 @@ void openMenu()
             break;
         case 1:
             openSocket();
-            closeSocket();
             break;
         default:
             printf("Opção inválida.\n");

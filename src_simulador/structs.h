@@ -3,7 +3,7 @@
 
 typedef struct
 {
-    const char *nome;
+    char *nome;
     int lotacaoMaxima;
     // const char *cargo;
 } Espaco;
@@ -12,8 +12,8 @@ typedef struct
 {
     int tempoSimulacao;
     int tempoMedioChegada;
-    float probDesistencia;
-    float probSaida;
+    double probDesistencia;
+    double probSaida;
     int numeroEspacos;
     Espaco *espacos;
 } Config;

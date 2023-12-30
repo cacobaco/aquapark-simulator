@@ -22,6 +22,7 @@
         "socket_server.h": "c",
         "un.h": "c",
         "features.h": "c",
-        "types.h": "c"
+        "types.h": "c",
+        "socket_client.h": "c"
     }
 }

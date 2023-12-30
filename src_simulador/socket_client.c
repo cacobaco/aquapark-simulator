@@ -1,48 +1,50 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
+#include <string.h>
+#include <unistd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include "socket.h"
+#include "socket_client.h"
 #include "util.h"
 
 #define MAX_LINE 512
 
+int sock_fd;
+
 void openSocket()
 {
-    int sock_fd, servlen;
+    int servlen;
     struct sockaddr_un serv_addr;
 
     if ((sock_fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
-        printf("client: can't open stream socket\n");
+    {
+        printf("Erro ao abrir socket.\n");
+        exit(1);
+        return;
+    }
+
+    printf("Socket aberta.\n");
 
     bzero((char *)&serv_addr, sizeof(serv_addr));
     serv_addr.sun_family = AF_UNIX;
     strcpy(serv_addr.sun_path, UNIXSTR_PATH);
     servlen = strlen(serv_addr.sun_path) + sizeof(serv_addr.sun_family);
 
+    printf("Conectando ao monitor...\n");
+
     if (connect(sock_fd, (struct sockaddr *)&serv_addr, servlen) < 0)
-        printf("client: can't connect to server\n");
-    else
     {
-        while (1)
-        {
-            char buf[MAX_LINE];
-            int n = readline(sock_fd, buf, MAX_LINE);
-
-            if (n < 0)
-                printf("str_cli:readline error\n");
-
-            buf[n - 1] = '\n';
-            buf[n] = 0;
-
-            fputs(buf, stdout);
-        }
+        printf("Erro ao conectar ao monitor.\n");
+        exit(1);
+        return;
     }
+
+    printf("Conectado ao monitor.\n");
 }
 
 void closeSocket()
 {
-    printf("Terminando conecxão com simulador.\n");
+    printf("Fechando socket...\n");
     close(sock_fd);
+    printf("Socket fechada.\n");
 }

@@ -1,5 +1,5 @@
-msrc = monitor/
-ssrc = simulador/
+msrc = src_monitor
+ssrc = src_simulador
 
 build:
 	+$(MAKE) -C $(msrc) build
@@ -10,7 +10,7 @@ clean:
 	+$(MAKE) -C $(msrc) clean
 	+$(MAKE) -C $(ssrc) clean
 
-copy: build
+copy:
 	cp $(msrc)/monitor .
 	cp $(ssrc)/simulador .
 	cp $(ssrc)/config.json .

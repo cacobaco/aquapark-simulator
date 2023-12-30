@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
+// #include <pthread.h>
 #include "config.h"
 #include "structs.h"
 #include "cJSON.h"
 
-Config *config = NULL;
+Config *config;
 
 void loadConfig()
 {
@@ -33,6 +33,13 @@ void loadConfig()
         exit(1);
     }
 
+    cJSON *tempoSimulacao = cJSON_GetObjectItemCaseSensitive(json, "tempo_simulacao");
+    if (!cJSON_IsNumber(tempoSimulacao))
+    {
+        printf("Ocorreu um erro ao carregar o tempo de simulação da configuração.\n");
+        exit(1);
+    }
+
     cJSON *tempoMedioChegada = cJSON_GetObjectItemCaseSensitive(json, "tempo_medio_chegada");
     if (!cJSON_IsNumber(tempoMedioChegada))
     {
@@ -47,10 +54,10 @@ void loadConfig()
         exit(1);
     }
 
-    cJSON *tempoSimulacao = cJSON_GetObjectItemCaseSensitive(json, "tempo_simulacao");
-    if (!cJSON_IsNumber(tempoSimulacao))
+    cJSON *probSaida = cJSON_GetObjectItemCaseSensitive(json, "prob_saida");
+    if (!cJSON_IsNumber(probDesistencia))
     {
-        printf("Ocorreu um erro ao carregar o tempo de simulação da configuração.\n");
+        printf("Ocorreu um erro ao carregar a probabilidade de desistência da configuração.\n");
         exit(1);
     }
 
@@ -76,44 +83,40 @@ void loadConfig()
         }
         espacos[i].nome = nome->valuestring;
 
-        cJSON *lotacao = cJSON_GetObjectItemCaseSensitive(espacoJson, "lotacao");
-        if (cJSON_IsNumber(lotacao))
+        cJSON *lotacaoMaxima = cJSON_GetObjectItemCaseSensitive(espacoJson, "lotacao_maxima");
+        if (cJSON_IsNumber(lotacaoMaxima))
         {
-            espacos[i].lotacao = lotacao->valueint;
+            espacos[i].lotacaoMaxima = lotacaoMaxima->valueint;
         }
 
-        cJSON *minimo = cJSON_GetObjectItemCaseSensitive(espacoJson, "minimo");
-        if (cJSON_IsNumber(minimo))
-        {
-            espacos[i].minimo = minimo->valueint;
-        }
-
-        cJSON *cargo = cJSON_GetObjectItemCaseSensitive(espacoJson, "cargo");
-        if (cJSON_IsString(cargo) && cargo->valuestring != NULL)
-        {
-            espacos[i].cargo = cargo->valuestring;
-        }
-        else
-        {
-            espacos[i].cargo = NULL;
-        }
+        // cJSON *cargo = cJSON_GetObjectItemCaseSensitive(espacoJson, "cargo");
+        // if (cJSON_IsString(cargo) && cargo->valuestring != NULL)
+        // {
+        //     espacos[i].cargo = cargo->valuestring;
+        // }
+        // else
+        // {
+        //     espacos[i].cargo = NULL;
+        // }
 
         i++;
     }
 
     config = malloc(sizeof(Config));
-    config->tempoMedioChegada = tempoMedioChegada->valueint;
-    config->probDesistencia = probDesistencia->valueint;
     config->tempoSimulacao = tempoSimulacao->valueint;
+    config->tempoMedioChegada = tempoMedioChegada->valueint;
+    config->probDesistencia = probDesistencia->valuedouble;
+    config->probSaida = probSaida->valuedouble;
     config->numeroEspacos = numeroEspacos;
     config->espacos = espacos;
 }
 
 void printConfig()
 {
-    printf("Tempo médio de chegada: %i\n", config->tempoMedioChegada);
-    printf("Probabilidade de desistência: %i\n", config->probDesistencia);
     printf("Tempo de simulação: %i\n", config->tempoSimulacao);
+    printf("Tempo médio de chegada: %i\n", config->tempoMedioChegada);
+    printf("Probabilidade de desistência: %f\n", config->probDesistencia);
+    printf("Probabilidade de saída: %f\n", config->probSaida);
     printf("Número de espaços: %i\n", config->numeroEspacos);
 
     for (int i = 0; i < config->numeroEspacos; i++)
@@ -122,14 +125,21 @@ void printConfig()
 
         printf("Espaço %i:\n", i + 1);
         printf("\tNome: %s\n", espaco->nome);
-        printf("\tLotação máxima: %i\n", espaco->lotacao);
-        printf("\tMínimo de pessoas: %i\n", espaco->minimo);
-        printf("\tCargo necessário: %s\n", espaco->cargo);
+        printf("\tLotação máxima: %i\n", espaco->lotacaoMaxima);
+        // printf("\tCargo necessário: %s\n", espaco->cargo);
     }
 }
 
 void freeConfig()
 {
+    for (int i = 0; i < config->numeroEspacos; i++)
+    {
+        Espaco *espaco = &(config->espacos[i]);
+
+        free(espaco->nome);
+        // free(espaco->cargo);
+    }
+
     free(config->espacos);
     free(config);
 }

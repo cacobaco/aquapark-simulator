@@ -64,12 +64,12 @@ int readline(int fd, char *ptr, int maxlen)
         else if (rc == 0)
         {
             if (n == 1)
-                return (0);
+                return 0;
             else
                 break;
         }
         else
-            return (-1);
+            return -1;
     }
 
     /* Não esquecer de terminar a string */
@@ -77,7 +77,7 @@ int readline(int fd, char *ptr, int maxlen)
 
     /* Note-se que n foi incrementado de modo a contar
        com o \n ou \0 */
-    return (n);
+    return n;
 }
 
 /* Mensagem de erro */

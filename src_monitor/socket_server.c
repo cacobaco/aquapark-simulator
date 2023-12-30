@@ -7,7 +7,7 @@
 #include "socket_server.h"
 #include "util.h"
 
-#define MAX_LINE 512
+#define MAX_LEN 512
 
 int sock_fd, sock_simulador_fd;
 
@@ -18,9 +18,12 @@ void openSocket()
 
     if ((sock_fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
     {
-        printf("server: can't open stream socket\n");
+        printf("Erro ao abrir socket.\n");
+        exit(1);
         return;
     }
+
+    printf("Socket aberta.\n");
 
     bzero((char *)&serv_addr, sizeof(serv_addr)); // limpeza preventiva
     serv_addr.sun_family = AF_UNIX;
@@ -31,31 +34,47 @@ void openSocket()
 
     if (bind(sock_fd, (struct sockaddr *)&serv_addr, servlen) < 0)
     {
-        printf("server, can't bind local address\n");
+        printf("Erro ao fazer vincular endereço local.\n");
+        exit(1);
         return;
     }
+
+    printf("Endereço local vinculado.\n");
 
     listen(sock_fd, 1); // aceita 1 cliente
 
     clilen = sizeof(cli_addr);
 
-    execlp("./simulador", "simulador", NULL);
-    printf("Aguardando conecxão do simulador...\n");
+    if (fork() == 0)
+    {
+        printf("teste");
+        return;
+    }
+    else
+    {
+        printf("teste2");
+    }
+
+    printf("Simulador aberto, aguardando conecxão do simulador...\n");
+
     sock_simulador_fd = accept(sock_fd, (struct sockaddr *)&cli_addr, &clilen);
 
     if (sock_simulador_fd < 0)
     {
-        printf("server: accept error\n");
+        printf("Erro ao aceitar conecxão do simulador.\n");
+        exit(1);
         return;
     }
 
+    printf("Simulador conectado.\n");
+
     while (1)
     {
-        char buf[MAX_LINE];
-        int n = readline(sock_fd, buf, MAX_LINE);
+        char buf[MAX_LEN];
+        int n = readline(sock_simulador_fd, buf, MAX_LEN);
 
         if (n < 0)
-            printf("str_cli: readline error\n");
+            printf("str_cli: readline error: %i\n", n);
 
         buf[n - 1] = '\n';
         buf[n] = 0;
@@ -63,13 +82,8 @@ void openSocket()
         fputs(buf, stdout);
     }
 
-    printf("Simulador conectado, simulação iniciada.\n");
-}
-
-void closeSocket()
-{
-    printf("Simulação terminada, fechando conecxão...\n");
+    printf("Simulador desconectado, fechando socket...\n");
     close(sock_simulador_fd);
     close(sock_fd);
-    printf("Conecxão fechada.\n");
+    printf("Socket fechada.\n");
 }

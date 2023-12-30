@@ -5,7 +5,7 @@
 #include <string.h>
 #include "utilizador.h"
 #include "structs.h"
-#include "socket.h"
+#include "socket_client.h"
 #include "util.h"
 
 #define MAX_LINE 512
