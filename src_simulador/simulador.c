@@ -57,6 +57,7 @@ void criarUtilizador()
     Utilizador *utilizador = malloc(sizeof(Utilizador));
     utilizador->id = userId;
 
+    // TODO percorrer array e ver espaço vazio
     pthread_create(&(config->utilizadores[utilizador->id]), NULL, comportamentoUtilizador, (void *)utilizador);
 
     char *buf = malloc(MAX_LEN);
