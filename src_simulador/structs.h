@@ -25,9 +25,10 @@ typedef struct
     Espaco *espacos;
 } Config;
 
-typedef struct // jony
+typedef struct
 {
     int id;
+    int pos; // posição no array de utilizadores, para controlo de threads
     // const char *cargo;
 } Utilizador;
 

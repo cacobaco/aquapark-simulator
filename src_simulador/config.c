@@ -7,6 +7,10 @@
 
 Config *config;
 
+/*
+ * função que carrega a configuração do ficheiro de configuração e cria a
+ * estrutura de dados correspondente na variável global config
+ */
 void loadConfig()
 {
     FILE *f = fopen(CONFIG_FILE, "r");
@@ -130,6 +134,9 @@ void loadConfig()
     config->espacos = espacos;
 }
 
+/*
+ * função que imprime a configuração
+ */
 void printConfig()
 {
     printf("Tempo de simulação: %i\n", config->tempoSimulacao);
@@ -151,8 +158,13 @@ void printConfig()
     }
 }
 
+/*
+ * função que liberta a memória alocada para a configuração
+ */
 void freeConfig()
 {
+    free(config->utilizadores);
+
     for (int i = 0; i < config->numeroEspacos; i++)
     {
         Espaco *espaco = &(config->espacos[i]);
