@@ -3,7 +3,7 @@
 
 #include "structs.h"
 
-void comportamentoUtilizador(void *arg);
+void *comportamentoUtilizador(void *arg);
 void entraEspaco(Utilizador *utilizador);
 
 #endif

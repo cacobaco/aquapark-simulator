@@ -6,7 +6,7 @@ clean:
 simulador: simulador.o config.o socket_client.o utilizador.o util.o cJSON.o
 	gcc -g simulador.o config.o socket_client.o utilizador.o util.o cJSON.o -lpthread -o simulador
 
-simulador.o: simulador.c config.h socket_client.h
+simulador.o: simulador.c config.h socket_client.h utilizador.h util.h
 	gcc -g -c simulador.c
 
 config.o: config.c config.h structs.h cJSON.h

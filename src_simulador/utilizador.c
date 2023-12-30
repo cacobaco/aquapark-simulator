@@ -11,7 +11,7 @@
 
 void entraEspaco(Utilizador *utilizador);
 
-void comportamentoUtilizador(void *arg)
+void *comportamentoUtilizador(void *arg)
 {
     Utilizador *utilizador = (Utilizador *)arg;
 
@@ -34,7 +34,7 @@ void entraEspaco(Utilizador *utilizador)
     {
         espaco->numUtilizadores++;
 
-        snprintf(buf, MAX_LEN, "Utilizador %i entrou no espaco %s.\n\n", utilizador->id, espaco->nome);
+        snprintf(buf, MAX_LEN, "Utilizador %i entrou no espaço %s.\n", utilizador->id, espaco->nome);
         writen(sock_fd, buf, strlen(buf));
 
         int sair = 0;
@@ -53,12 +53,12 @@ void entraEspaco(Utilizador *utilizador)
 
         espaco->numUtilizadores--;
 
-        snprintf(buf, MAX_LEN, "Utilizador %i saiu do espaco %s.\n\n", utilizador->id, espaco->nome);
+        snprintf(buf, MAX_LEN, "Utilizador %i saiu do espaço %s.\n", utilizador->id, espaco->nome);
         writen(sock_fd, buf, strlen(buf));
     }
     else
     {
-        snprintf(buf, MAX_LEN, "Utilizador %i não entrou no espaco %s porque está cheio.\n\n", utilizador->id, espaco->nome);
+        snprintf(buf, MAX_LEN, "Utilizador %i não entrou no espaço %s porque está cheio.\n", utilizador->id, espaco->nome);
         writen(sock_fd, buf, strlen(buf));
     }
 }

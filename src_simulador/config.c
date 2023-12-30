@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-// #include <pthread.h>
+#include <pthread.h>
 #include "config.h"
 #include "structs.h"
 #include "cJSON.h"
@@ -103,6 +103,8 @@ void loadConfig()
             espacos[i].lotacaoMaxima = lotacaoMaxima->valueint;
         }
 
+        espacos[i].numUtilizadores = 0;
+
         // cJSON *cargo = cJSON_GetObjectItemCaseSensitive(espacoJson, "cargo");
         // if (cJSON_IsString(cargo) && cargo->valuestring != NULL)
         // {
@@ -135,7 +137,7 @@ void printConfig()
     printf("Probabilidade de entrada no espaço: %f\n", config->probEntradaEspaco);
     printf("Probabilidade de saída do espaço: %f\n", config->probSaidaEspaco);
     printf("Probabilidade de saída do parque: %f\n", config->probSaidaParque);
-    printf("Lotação máxima do parque: %f\n", config->lotacaoMaxima);
+    printf("Lotação máxima do parque: %i\n", config->lotacaoMaxima);
     printf("Número de espaços: %i\n", config->numeroEspacos);
 
     for (int i = 0; i < config->numeroEspacos; i++)
