@@ -8,8 +8,8 @@
     "espacos": [
         {
             "nome": "wc",
-            "lotacao_maxima": 1,
-            "lotacao_maxima_fila": 50
+            "lotacao_maxima": 2,
+            "lotacao_maxima_fila": 5
         }
     ]
 }

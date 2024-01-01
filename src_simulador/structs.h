@@ -8,12 +8,10 @@ typedef struct
 {
     char *nome;
     int lotacaoMaxima;
-    pthread_mutex_t mutexLotacao;
     sem_t semaforoEntrada;
 
     int bTemFila;
     int lotacaoMaximaFila;
-    pthread_mutex_t mutexLotacaoFila;
     sem_t semaforoFila;
 
     int bTemDuracao;
