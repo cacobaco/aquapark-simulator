@@ -9,6 +9,7 @@ typedef struct
     char *nome;
     int lotacaoMaxima;
     sem_t semaforoEntrada;
+    pthread_mutex_t mutexEntrada;
 
     int bTemFila;
     int lotacaoMaximaFila;

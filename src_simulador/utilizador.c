@@ -115,17 +115,6 @@ int entraEspaco(Utilizador *utilizador, Espaco *espaco)
     {
         int lotacaoFila = 0;
 
-        if (!sem_trywait(&(espaco->semaforoEntrada)))
-        { // espaço livre, entra logo e ocupa um lugar
-            sem_getvalue(&(espaco->semaforoEntrada), &lotacao);
-            lotacao = espaco->lotacaoMaxima - lotacao;
-
-            snprintf(buf, MAX_LEN, "Utilizador %i entrou no espaço %s (%i/%i).\n", utilizador->id, espaco->nome, lotacao, espaco->lotacaoMaxima);
-            writen(sock_fd, buf, strlen(buf));
-
-            return 1;
-        }
-
         if (sem_trywait(&(espaco->semaforoFila)))
         { // fila cheia, não entra
             sem_getvalue(&(espaco->semaforoFila), &lotacaoFila);
@@ -143,14 +132,15 @@ int entraEspaco(Utilizador *utilizador, Espaco *espaco)
         snprintf(buf, MAX_LEN, "Utilizador %i entrou na fila do espaço %s (%i/%i).\n", utilizador->id, espaco->nome, lotacaoFila, espaco->lotacaoMaximaFila);
         writen(sock_fd, buf, strlen(buf));
 
-        sem_wait(&(espaco->semaforoEntrada)); // esperar que haja um lugar no espaço
-        sem_post(&(espaco->semaforoFila));    // libertar um lugar na fila
+        sem_wait(&(espaco->semaforoEntrada));
 
         sem_getvalue(&(espaco->semaforoEntrada), &lotacao);
         lotacao = espaco->lotacaoMaxima - lotacao;
 
         snprintf(buf, MAX_LEN, "Utilizador %i entrou no espaço %s (%i/%i).\n", utilizador->id, espaco->nome, lotacao, espaco->lotacaoMaxima);
         writen(sock_fd, buf, strlen(buf));
+
+        sem_post(&(espaco->semaforoFila));
 
         return 1;
     }
