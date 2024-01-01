@@ -118,12 +118,17 @@ void loadConfig()
             return;
         }
         espacos[i].lotacaoMaxima = lotacaoMaxima->valueint;
+        espacos[i].lotacao = 0;
+        pthread_mutex_init(&(espacos[i].mutexLotacao), NULL);
 
         cJSON *lotacaoMaximaFila = cJSON_GetObjectItemCaseSensitive(espacoJson, "lotacao_maxima_fila");
         if (cJSON_IsNumber(lotacaoMaximaFila))
         {
             espacos[i].bTemFila = 1;
             espacos[i].lotacaoMaximaFila = lotacaoMaximaFila->valueint;
+            espacos[i].lotacaoFila = 0;
+            pthread_mutex_init(&(espacos[i].mutexLotacaoFila), NULL);
+            sem_init(&(espacos[i].semaforoEntrada), 0, espacos[i].lotacaoMaxima);
         }
         else
         {
@@ -153,20 +158,13 @@ void loadConfig()
 
             espacos[i].bTemIntervalo = 1;
             espacos[i].intervalo = intervalo->valueint;
+            espacos[i].bAguardar = 0;
+            pthread_mutex_init(&(espacos[i].mutexAguardar), NULL);
         }
         else
         {
             espacos[i].bTemIntervalo = 0;
         }
-
-        espacos[i].lotacao = 0;
-        espacos[i].lotacaoFila = 0;
-        espacos[i].bAguardar = 1;
-
-        pthread_mutex_init(&(espacos[i].mutexLotacao), NULL);
-        pthread_mutex_init(&(espacos[i].mutexLotacaoFila), NULL);
-        sem_init(&(espacos[i].semaforoEntrada), 0, 0);
-        pthread_mutex_init(&(espacos[i].mutexAguardar), NULL);
 
         i++;
     }
@@ -233,10 +231,18 @@ void freeConfig()
         Espaco *espaco = &(config->espacos[i]);
 
         free(espaco->nome);
-        pthread_mutex_destroy(&(espaco->mutexLotacao));
-        pthread_mutex_destroy(&(espaco->mutexLotacaoFila));
-        sem_destroy(&(espaco->semaforoEntrada));
-        pthread_mutex_destroy(&(espaco->mutexAguardar));
+        pthread_attr_destroy(&(espaco->mutexLotacao));
+
+        if (espaco->bTemFila)
+        {
+            pthread_attr_destroy(&(espaco->mutexLotacaoFila));
+            sem_destroy(&(espaco->semaforoEntrada));
+        }
+
+        if (espaco->bTemIntervalo)
+        {
+            pthread_attr_destroy(&(espaco->mutexAguardar));
+        }
     }
 
     free(config->espacos);

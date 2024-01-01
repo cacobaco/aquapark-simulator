@@ -10,18 +10,20 @@ typedef struct
     int lotacaoMaxima;
     int lotacao;
     pthread_mutex_t mutexLotacao;
+
     int bTemFila;
     int lotacaoMaximaFila;
     int lotacaoFila;
     pthread_mutex_t mutexLotacaoFila;
     sem_t semaforoEntrada;
+
     int bTemDuracao;
     int duracao;
+
     int bTemIntervalo;
     int intervalo;
     int bAguardar;                 // flag para os intervalos
     pthread_mutex_t mutexAguardar; // mutex para os intervalos
-
 } Espaco;
 
 typedef struct

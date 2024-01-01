@@ -125,7 +125,7 @@ int entraEspaco(Utilizador *utilizador, Espaco *espaco)
         pthread_mutex_lock(&(espaco->mutexLotacaoFila)); // fechar trinco antes de aceder e modificar a lotação da fila
 
         if (espaco->lotacaoFila <= 0 && espaco->lotacao < espaco->lotacaoMaxima)
-        {
+        { // se não houver ninguém na fila e o espaço não estiver cheio, entra logo
             espaco->lotacao++;
 
             snprintf(buf, MAX_LEN, "Utilizador %i entrou no espaço %s (%i/%i).\n", utilizador->id, espaco->nome, espaco->lotacao, espaco->lotacaoMaxima);
