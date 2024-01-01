@@ -112,12 +112,41 @@ int entraEspaco(Utilizador *utilizador, Espaco *espaco)
 
     if (espaco->bTemFila)
     {
-        // TODO fiquei aqui
+        int lotacaoFila = 0;
+
+        if (sem_trywait(&(espaco->semaforoFila)))
+        { // fila cheia, não entra
+            sem_getvalue(&(espaco->semaforoFila), &lotacaoFila);
+            lotacaoFila = espaco->lotacaoMaximaFila - lotacaoFila;
+
+            snprintf(buf, MAX_LEN, "Utilizador %i não entrou no espaço %s porque a fila está cheia (%i/%i).\n", utilizador->id, espaco->nome, lotacaoFila, espaco->lotacaoMaximaFila);
+            writen(sock_fd, buf, strlen(buf));
+
+            return 0;
+        }
+
+        sem_getvalue(&(espaco->semaforoFila), &lotacaoFila);
+        lotacaoFila = espaco->lotacaoMaximaFila - lotacaoFila;
+
+        snprintf(buf, MAX_LEN, "Utilizador %i entrou na fila do espaço %s (%i/%i).\n", utilizador->id, espaco->nome, lotacaoFila, espaco->lotacaoMaximaFila);
+        writen(sock_fd, buf, strlen(buf));
+
+        sem_post(&(espaco->semaforoFila)); // libertar um lugar na fila
+
+        int lotacao = 0;
+
+        sem_getvalue(&(espaco->semaforoEntrada), &lotacao);
+        lotacao = espaco->lotacaoMaxima - lotacao;
+
+        snprintf(buf, MAX_LEN, "Utilizador %i entrou no espaço %s (%i/%i).\n", utilizador->id, espaco->nome, lotacao, espaco->lotacaoMaxima);
+        writen(sock_fd, buf, strlen(buf));
+
+        return 1;
     }
 
-    pthread_mutex_lock(&(espaco->mutexLotacao)); // fechar trinco antes de aceder à lotação
-
     int lotacao = 0;
+
+    pthread_mutex_lock(&(espaco->mutexLotacao)); // fechar trinco antes de aceder à lotação
 
     if (sem_trywait(&(espaco->semaforoEntrada)))
     { // espaço cheio
@@ -147,8 +176,6 @@ void saiEspaco(Utilizador *utilizador, Espaco *espaco)
 {
     char buf[MAX_LEN];
 
-    pthread_mutex_lock(&(espaco->mutexLotacao)); // fechar trinco antes de aceder à lotação
-
     sem_post(&(espaco->semaforoEntrada));
 
     int lotacao = 0;
@@ -157,6 +184,4 @@ void saiEspaco(Utilizador *utilizador, Espaco *espaco)
 
     snprintf(buf, MAX_LEN, "Utilizador %i saiu do espaço %s (%i/%i).\n", utilizador->id, espaco->nome, lotacao, espaco->lotacaoMaxima);
     writen(sock_fd, buf, strlen(buf));
-
-    pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder à lotação
 }

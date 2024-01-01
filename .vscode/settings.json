@@ -23,6 +23,7 @@
         "un.h": "c",
         "features.h": "c",
         "types.h": "c",
-        "socket_client.h": "c"
+        "socket_client.h": "c",
+        "semaphore.h": "c"
     }
 }

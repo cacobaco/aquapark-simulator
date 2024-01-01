@@ -1,19 +1,15 @@
 {
     "tempo_simulacao": 600,
     "tempo_medio_chegada": 5,
-    "prob_entrada_espaco": 0.60,
+    "prob_entrada_espaco": 1,
     "prob_saida_espaco": 0.20,
     "prob_saida_parque": 0.05,
     "lotacao_maxima": 500,
     "espacos": [
         {
             "nome": "wc",
-            "lotacao_maxima": 5,
+            "lotacao_maxima": 1,
             "lotacao_maxima_fila": 50
-        },
-        {
-            "nome": "piscina",
-            "lotacao_maxima": 5
         }
     ]
 }
