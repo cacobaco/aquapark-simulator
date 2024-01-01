@@ -118,55 +118,21 @@ void loadConfig()
             return;
         }
         espacos[i].lotacaoMaxima = lotacaoMaxima->valueint;
+        pthread_mutex_init(&(espacos[i].mutexLotacao), NULL);
+        sem_init(&(espacos[i].semaforoEntrada), 0, espacos[i].lotacaoMaxima);
 
         cJSON *lotacaoMaximaFila = cJSON_GetObjectItemCaseSensitive(espacoJson, "lotacao_maxima_fila");
         if (cJSON_IsNumber(lotacaoMaximaFila))
         {
             espacos[i].bTemFila = 1;
             espacos[i].lotacaoMaximaFila = lotacaoMaximaFila->valueint;
+            pthread_mutex_init(&(espacos[i].mutexLotacaoFila), NULL);
+            sem_init(&(espacos[i].semaforoFila), 0, espacos[i].lotacaoMaximaFila);
         }
         else
         {
             espacos[i].bTemFila = 0;
         }
-
-        cJSON *duracao = cJSON_GetObjectItemCaseSensitive(espacoJson, "duracao");
-        if (cJSON_IsNumber(duracao))
-        {
-            espacos[i].bTemDuracao = 1;
-            espacos[i].duracao = duracao->valueint;
-        }
-        else
-        {
-            espacos[i].bTemDuracao = 0;
-        }
-
-        cJSON *intervalo = cJSON_GetObjectItemCaseSensitive(espacoJson, "intervalo");
-        if (cJSON_IsNumber(intervalo))
-        {
-            if (!espacos[i].bTemFila)
-            {
-                printf("Ocorreu um erro ao carregar o intervalo do espaço %s: espaço não tem fila\n", espacos[i].nome);
-                exit(1);
-                return;
-            }
-
-            espacos[i].bTemIntervalo = 1;
-            espacos[i].intervalo = intervalo->valueint;
-        }
-        else
-        {
-            espacos[i].bTemIntervalo = 0;
-        }
-
-        espacos[i].lotacao = 0;
-        espacos[i].lotacaoFila = 0;
-        espacos[i].bAguardar = 1;
-
-        pthread_mutex_init(&(espacos[i].mutexLotacao), NULL);
-        pthread_mutex_init(&(espacos[i].mutexLotacaoFila), NULL);
-        sem_init(&(espacos[i].semaforoEntrada), 0, 0);
-        pthread_mutex_init(&(espacos[i].mutexAguardar), NULL);
 
         i++;
     }
@@ -203,21 +169,6 @@ void printConfig()
         printf("Espaço %i:\n", i + 1);
         printf("\tNome: %s\n", espaco->nome);
         printf("\tLotação máxima: %i\n", espaco->lotacaoMaxima);
-
-        if (espaco->bTemFila)
-        {
-            printf("\tLotação máxima da fila: %i\n", espaco->lotacaoMaximaFila);
-        }
-
-        if (espaco->bTemDuracao)
-        {
-            printf("\tDuração: %i\n", espaco->duracao);
-        }
-
-        if (espaco->bTemIntervalo)
-        {
-            printf("\tIntervalo: %i\n", espaco->intervalo);
-        }
     }
 }
 
@@ -234,9 +185,13 @@ void freeConfig()
 
         free(espaco->nome);
         pthread_mutex_destroy(&(espaco->mutexLotacao));
-        pthread_mutex_destroy(&(espaco->mutexLotacaoFila));
         sem_destroy(&(espaco->semaforoEntrada));
-        pthread_mutex_destroy(&(espaco->mutexAguardar));
+
+        if (espaco->bTemFila)
+        {
+            pthread_mutex_destroy(&(espaco->mutexLotacaoFila));
+            sem_destroy(&(espaco->semaforoFila));
+        }
     }
 
     free(config->espacos);

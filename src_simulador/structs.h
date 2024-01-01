@@ -8,20 +8,27 @@ typedef struct
 {
     char *nome;
     int lotacaoMaxima;
-    int lotacao;
     pthread_mutex_t mutexLotacao;
+    sem_t semaforoEntrada;
+
     int bTemFila;
     int lotacaoMaximaFila;
-    int lotacaoFila;
     pthread_mutex_t mutexLotacaoFila;
-    sem_t semaforoEntrada;
+    sem_t semaforoFila;
+
     int bTemDuracao;
     int duracao;
-    int bTemIntervalo;
-    int intervalo;
-    int bAguardar;                 // flag para os intervalos
-    pthread_mutex_t mutexAguardar; // mutex para os intervalos
 
+    // int bTemFila;
+    // int lotacaoFila;
+    // pthread_mutex_t mutexLotacaoFila;
+    // sem_t semaforoEntrada;
+    // int bTemDuracao;
+    // int duracao;
+    // int bTemIntervalo;
+    // int intervalo;
+    // int bAguardar;                 // flag para os intervalos
+    // pthread_mutex_t mutexAguardar; // mutex para os intervalos
 } Espaco;
 
 typedef struct

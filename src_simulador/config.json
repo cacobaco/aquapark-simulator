@@ -14,18 +14,6 @@
         {
             "nome": "piscina",
             "lotacao_maxima": 5
-        },
-        {
-            "nome": "rio lento",
-            "lotacao_maxima": 5,
-            "duracao": 10
-        },
-        {
-            "nome": "tobogã branco",
-            "lotacao_maxima": 3,
-            "lotacao_maxima_fila": 50,
-            "duracao": 10,
-            "intervalo": 5
         }
     ]
 }
