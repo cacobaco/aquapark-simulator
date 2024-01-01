@@ -7,16 +7,25 @@
     "lotacao_maxima": 500,
     "espacos": [
         {
+            "nome": "wc",
+            "lotacao_maxima": 5,
+            "lotacao_maxima_fila": 50
+        },
+        {
             "nome": "piscina",
-            "lotacao_maxima": 20
+            "lotacao_maxima": 5
         },
         {
-            "nome": "piscina2",
-            "lotacao_maxima": 50
+            "nome": "rio lento",
+            "lotacao_maxima": 5,
+            "duracao": 10
         },
         {
-            "nome": "piscina3",
-            "lotacao_maxima": 100
+            "nome": "tobogã branco",
+            "lotacao_maxima": 3,
+            "lotacao_maxima_fila": 50,
+            "duracao": 10,
+            "intervalo": 5
         }
     ]
 }

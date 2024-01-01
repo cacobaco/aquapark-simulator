@@ -35,55 +35,63 @@ void loadConfig()
     {
         printf("Ocorreu um erro ao carregar a configuração.\n");
         exit(1);
+        return;
     }
 
     cJSON *tempoSimulacao = cJSON_GetObjectItemCaseSensitive(json, "tempo_simulacao");
     if (!cJSON_IsNumber(tempoSimulacao))
     {
-        printf("Ocorreu um erro ao carregar tempo_simulacao.\n");
+        printf("Ocorreu um erro ao carregar tempo_simulacao: não está definido ou não é número\n");
         exit(1);
+        return;
     }
 
     cJSON *tempoMedioChegada = cJSON_GetObjectItemCaseSensitive(json, "tempo_medio_chegada");
     if (!cJSON_IsNumber(tempoMedioChegada))
     {
-        printf("Ocorreu um erro ao carregar tempo_medio_chegada.\n");
+        printf("Ocorreu um erro ao carregar tempo_medio_chegada: não está definido ou não é número\n");
         exit(1);
+        return;
     }
 
     cJSON *probEntradaEspaco = cJSON_GetObjectItemCaseSensitive(json, "prob_entrada_espaco");
     if (!cJSON_IsNumber(probEntradaEspaco))
     {
-        printf("Ocorreu um erro ao carregar prob_entrada_espaco.\n");
+        printf("Ocorreu um erro ao carregar prob_entrada_espaco: não está definido ou não é número\n");
         exit(1);
+        return;
     }
 
     cJSON *probSaidaEspaco = cJSON_GetObjectItemCaseSensitive(json, "prob_saida_espaco");
     if (!cJSON_IsNumber(probSaidaEspaco))
     {
-        printf("Ocorreu um erro ao carregar prob_saida_espaco.\n");
+        printf("Ocorreu um erro ao carregar prob_saida_espaco: não está definido ou não é número\n");
         exit(1);
+        return;
     }
 
     cJSON *probSaidaParque = cJSON_GetObjectItemCaseSensitive(json, "prob_saida_parque");
     if (!cJSON_IsNumber(probSaidaParque))
     {
-        printf("Ocorreu um erro ao carregar prob_saida_parque.\n");
+        printf("Ocorreu um erro ao carregar prob_saida_parque: não está definido ou não é número\n");
         exit(1);
+        return;
     }
 
     cJSON *lotacaoMaxima = cJSON_GetObjectItemCaseSensitive(json, "lotacao_maxima");
     if (!cJSON_IsNumber(lotacaoMaxima))
     {
-        printf("Ocorreu um erro ao carregar lotacao_maxima.\n");
+        printf("Ocorreu um erro ao carregar lotacao_maxima: não está definido ou não é número\n");
         exit(1);
+        return;
     }
 
     cJSON *espacosJson = cJSON_GetObjectItemCaseSensitive(json, "espacos");
     if (!cJSON_IsArray(espacosJson))
     {
-        printf("Ocorreu um erro ao carregar os espaços da configuração.\n");
+        printf("Ocorreu um erro ao carregar os espaços da configuração: não está definido ou não é número\n");
         exit(1);
+        return;
     }
 
     int numeroEspacos = cJSON_GetArraySize(espacosJson);
@@ -96,28 +104,69 @@ void loadConfig()
         cJSON *nome = cJSON_GetObjectItemCaseSensitive(espacoJson, "nome");
         if (!cJSON_IsString(nome) || nome->valuestring == NULL)
         {
-            printf("Ocorreu um erro ao carregar o nome de um dos espaços da configuração.\n");
+            printf("Ocorreu um erro ao carregar o nome de um dos espaços da configuração: não está definido ou não é string\n");
             exit(1);
+            return;
         }
         espacos[i].nome = nome->valuestring;
 
         cJSON *lotacaoMaxima = cJSON_GetObjectItemCaseSensitive(espacoJson, "lotacao_maxima");
-        if (cJSON_IsNumber(lotacaoMaxima))
+        if (!cJSON_IsNumber(lotacaoMaxima))
         {
-            espacos[i].lotacaoMaxima = lotacaoMaxima->valueint;
+            printf("Ocorreu um erro ao carregar a lotação máxima do espaço %s: não está definido ou não é número\n", espacos[i].nome);
+            exit(1);
+            return;
+        }
+        espacos[i].lotacaoMaxima = lotacaoMaxima->valueint;
+
+        cJSON *lotacaoMaximaFila = cJSON_GetObjectItemCaseSensitive(espacoJson, "lotacao_maxima_fila");
+        if (cJSON_IsNumber(lotacaoMaximaFila))
+        {
+            espacos[i].bTemFila = 1;
+            espacos[i].lotacaoMaximaFila = lotacaoMaximaFila->valueint;
+        }
+        else
+        {
+            espacos[i].bTemFila = 0;
         }
 
-        espacos[i].numUtilizadores = 0;
+        cJSON *duracao = cJSON_GetObjectItemCaseSensitive(espacoJson, "duracao");
+        if (cJSON_IsNumber(duracao))
+        {
+            espacos[i].bTemDuracao = 1;
+            espacos[i].duracao = duracao->valueint;
+        }
+        else
+        {
+            espacos[i].bTemDuracao = 0;
+        }
 
-        // cJSON *cargo = cJSON_GetObjectItemCaseSensitive(espacoJson, "cargo");
-        // if (cJSON_IsString(cargo) && cargo->valuestring != NULL)
-        // {
-        //     espacos[i].cargo = cargo->valuestring;
-        // }
-        // else
-        // {
-        //     espacos[i].cargo = NULL;
-        // }
+        cJSON *intervalo = cJSON_GetObjectItemCaseSensitive(espacoJson, "intervalo");
+        if (cJSON_IsNumber(intervalo))
+        {
+            if (!espacos[i].bTemFila)
+            {
+                printf("Ocorreu um erro ao carregar o intervalo do espaço %s: espaço não tem fila\n", espacos[i].nome);
+                exit(1);
+                return;
+            }
+
+            espacos[i].bTemIntervalo = 1;
+            espacos[i].intervalo = intervalo->valueint;
+        }
+        else
+        {
+            espacos[i].bTemIntervalo = 0;
+        }
+
+        espacos[i].lotacao = 0;
+        espacos[i].lotacaoFila = 0;
+        espacos[i].bAguardar = 1;
+
+        pthread_mutex_init(&(espacos[i].mutexLotacao), NULL);
+        pthread_mutex_init(&(espacos[i].mutexLotacaoFila), NULL);
+        sem_init(&(espacos[i].semaforoEntrada), 0, 0);
+        pthread_mutex_init(&(espacos[i].mutexAguardar), NULL);
 
         i++;
     }
@@ -154,7 +203,21 @@ void printConfig()
         printf("Espaço %i:\n", i + 1);
         printf("\tNome: %s\n", espaco->nome);
         printf("\tLotação máxima: %i\n", espaco->lotacaoMaxima);
-        // printf("\tCargo necessário: %s\n", espaco->cargo);
+
+        if (espaco->bTemFila)
+        {
+            printf("\tLotação máxima da fila: %i\n", espaco->lotacaoMaximaFila);
+        }
+
+        if (espaco->bTemDuracao)
+        {
+            printf("\tDuração: %i\n", espaco->duracao);
+        }
+
+        if (espaco->bTemIntervalo)
+        {
+            printf("\tIntervalo: %i\n", espaco->intervalo);
+        }
     }
 }
 
@@ -170,7 +233,10 @@ void freeConfig()
         Espaco *espaco = &(config->espacos[i]);
 
         free(espaco->nome);
-        // free(espaco->cargo);
+        pthread_mutex_destroy(&(espaco->mutexLotacao));
+        pthread_mutex_destroy(&(espaco->mutexLotacaoFila));
+        sem_destroy(&(espaco->semaforoEntrada));
+        pthread_mutex_destroy(&(espaco->mutexAguardar));
     }
 
     free(config->espacos);
