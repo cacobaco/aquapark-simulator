@@ -156,7 +156,7 @@ int entraEspaco(Utilizador *utilizador, Espaco *espaco)
 
         pthread_mutex_unlock(&(espaco->mutexLotacaoFila)); // abrir trinco depois de aceder e modificar a lotação da fila
 
-        sem_wait(&(espaco->semaforoEntrada)); // esperar que o semáforo abra
+        sem_wait(&(espaco->semEntradaFila)); // esperar que o semáforo da fila abra
 
         pthread_mutex_lock(&(espaco->mutexLotacao));     // fechar trinco antes de aceder e modificar a lotação
         pthread_mutex_lock(&(espaco->mutexLotacaoFila)); // fechar trinco antes de aceder e modificar a lotação da fila
@@ -219,7 +219,7 @@ void saiEspaco(Utilizador *utilizador, Espaco *espaco)
 
         if (espaco->lotacaoFila > 0)
         {
-            sem_post(&(espaco->semaforoEntrada)); // abrir semáforo para o próximo utilizador entrar
+            sem_post(&(espaco->semEntradaFila)); // abrir semáforo da fila
         }
 
         pthread_mutex_unlock(&(espaco->mutexLotacaoFila)); // abrir trinco depois de aceder a lotação da fila

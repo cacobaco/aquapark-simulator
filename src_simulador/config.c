@@ -128,7 +128,7 @@ void loadConfig()
             espacos[i].lotacaoMaximaFila = lotacaoMaximaFila->valueint;
             espacos[i].lotacaoFila = 0;
             pthread_mutex_init(&(espacos[i].mutexLotacaoFila), NULL);
-            sem_init(&(espacos[i].semaforoEntrada), 0, espacos[i].lotacaoMaxima);
+            sem_init(&(espacos[i].semEntradaFila), 0, 0);
         }
         else
         {
@@ -231,17 +231,17 @@ void freeConfig()
         Espaco *espaco = &(config->espacos[i]);
 
         free(espaco->nome);
-        pthread_attr_destroy(&(espaco->mutexLotacao));
+        pthread_mutex_destroy(&(espaco->mutexLotacao));
 
         if (espaco->bTemFila)
         {
-            pthread_attr_destroy(&(espaco->mutexLotacaoFila));
-            sem_destroy(&(espaco->semaforoEntrada));
+            pthread_mutex_destroy(&(espaco->mutexLotacaoFila));
+            sem_destroy(&(espaco->semEntradaFila));
         }
 
         if (espaco->bTemIntervalo)
         {
-            pthread_attr_destroy(&(espaco->mutexAguardar));
+            pthread_mutex_destroy(&(espaco->mutexAguardar));
         }
     }
 

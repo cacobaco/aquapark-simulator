@@ -69,6 +69,9 @@ void openSocket()
         buf[n - 1] = '\n';
         buf[n] = 0;
 
+        if (strcmp(buf, "exit\n") == 0)
+            break;
+
         fputs(buf, stdout);
     }
 

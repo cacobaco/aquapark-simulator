@@ -15,7 +15,7 @@ typedef struct
     int lotacaoMaximaFila;
     int lotacaoFila;
     pthread_mutex_t mutexLotacaoFila;
-    sem_t semaforoEntrada;
+    sem_t semEntradaFila;
 
     int bTemDuracao;
     int duracao;

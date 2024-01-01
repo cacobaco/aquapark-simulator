@@ -41,6 +41,10 @@ void main(int argc, char const *argv[])
         }
     }
 
+    char buf[MAX_LEN];
+    snprintf(buf, MAX_LEN, "exit");
+    writen(sock_fd, buf, strlen(buf));
+
     closeSocket();
     freeConfig();
     exit(0);

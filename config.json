@@ -1,31 +1,16 @@
 {
-    "tempo_simulacao": 600,
-    "tempo_medio_chegada": 5,
+    "tempo_simulacao": 60,
+    "tempo_medio_chegada": 3,
     "prob_entrada_espaco": 0.60,
     "prob_saida_espaco": 0.20,
     "prob_saida_parque": 0.05,
     "lotacao_maxima": 500,
     "espacos": [
         {
-            "nome": "wc",
-            "lotacao_maxima": 5,
-            "lotacao_maxima_fila": 50
-        },
-        {
-            "nome": "piscina",
-            "lotacao_maxima": 5
-        },
-        {
-            "nome": "rio lento",
-            "lotacao_maxima": 5,
-            "duracao": 10
-        },
-        {
             "nome": "tobogã branco",
-            "lotacao_maxima": 3,
-            "lotacao_maxima_fila": 50,
-            "duracao": 10,
-            "intervalo": 5
+            "lotacao_maxima": 1,
+            "lotacao_maxima_fila": 4,
+            "duracao": 1
         }
     ]
 }
