@@ -9,5 +9,6 @@
 extern int sock_fd, sock_simulador_fd;
 
 void openSocket();
+void closeSocket();
 
 #endif

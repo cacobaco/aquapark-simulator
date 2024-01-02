@@ -14,7 +14,7 @@ void main(int argc, char const *argv[])
     srand(time(NULL));
 
     loadConfig();
-    printConfig();
+    // printConfig();
     openSocket();
 
     int tempoTotal = 0;

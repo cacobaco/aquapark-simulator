@@ -10,7 +10,27 @@
         {
             "nome": "wc",
             "lotacao_maxima": 5,
+            "lotacao_maxima_fila": 50
+        },
+        {
+            "nome": "piscina",
+            "lotacao_maxima": 50
+        },
+        {
+            "nome": "rio lento",
+            "lotacao_maxima": 50,
+            "duracao": 10
+        },
+        {
+            "nome": "tobogã branco",
+            "lotacao_maxima": 5,
             "lotacao_maxima_fila": 50,
+            "duracao": 10
+        },
+        {
+            "nome": "pista hotwheels",
+            "lotacao_maxima": 4,
+            "lotacao_maxima_fila": 40,
             "duracao": 10,
             "corrida": true
         }

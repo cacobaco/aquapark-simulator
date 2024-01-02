@@ -6,6 +6,7 @@
 #include <sys/un.h>
 #include "socket_server.h"
 #include "util.h"
+#include "logs.h"
 
 int sock_fd, sock_simulador_fd;
 
@@ -43,7 +44,18 @@ void openSocket()
 
     clilen = sizeof(cli_addr);
 
-    // TODO lançar simulador
+    if (fork() == 0)
+    {
+        if (execl("./simulador", "simulador", NULL) < 0)
+        {
+            printf("Erro ao executar o simulador.\n");
+            exit(1);
+            return;
+        }
+
+        exit(0);
+        return;
+    }
 
     printf("Simulador aberto, aguardando conecxão do simulador...\n");
 
@@ -57,6 +69,7 @@ void openSocket()
     }
 
     printf("Simulador conectado.\n");
+    addLogMessage("Simulação iniciada.\n");
 
     while (1)
     {
@@ -73,10 +86,17 @@ void openSocket()
             break;
 
         fputs(buf, stdout);
+        addLogMessage(buf);
     }
 
-    printf("Simulador desconectado, fechando socket...\n");
-    close(sock_simulador_fd);
+    addLogMessage("Fim da simulação.\n\n\n\n");
+    printf("Simulador desconectado.\n");
+}
+
+void closeSocket()
+{
+    printf("Fechando socket...\n");
     close(sock_fd);
+    close(sock_simulador_fd);
     printf("Socket fechada.\n");
 }
