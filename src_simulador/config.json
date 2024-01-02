@@ -5,6 +5,7 @@
     "prob_saida_espaco": 0.20,
     "prob_saida_parque": 0.05,
     "lotacao_maxima": 500,
+    "prob_vip": 0.10,
     "espacos": [
         {
             "nome": "wc",

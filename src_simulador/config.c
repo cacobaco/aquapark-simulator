@@ -86,6 +86,14 @@ void loadConfig()
         return;
     }
 
+    cJSON *probVip = cJSON_GetObjectItemCaseSensitive(json, "prob_vip");
+    if (!cJSON_IsNumber(probVip))
+    {
+        printf("Ocorreu um erro ao carregar prob_vip: não está definido ou não é número\n");
+        exit(1);
+        return;
+    }
+
     cJSON *espacosJson = cJSON_GetObjectItemCaseSensitive(json, "espacos");
     if (!cJSON_IsArray(espacosJson))
     {
@@ -127,8 +135,10 @@ void loadConfig()
             espacos[i].bFila = 1;
             espacos[i].lotacaoMaximaFila = lotacaoMaximaFila->valueint;
             espacos[i].lotacaoFila = 0;
+            espacos[i].numVips = 0;
             pthread_mutex_init(&(espacos[i].mutexLotacaoFila), NULL);
             sem_init(&(espacos[i].semaforoFila), 0, 0);
+            sem_init(&(espacos[i].semaforoVips), 0, 0);
         }
         else
         {
@@ -177,10 +187,11 @@ void loadConfig()
     config->probSaidaEspaco = probSaidaEspaco->valuedouble;
     config->probSaidaParque = probSaidaParque->valuedouble;
     config->lotacaoMaxima = lotacaoMaxima->valueint;
+    config->probVip = probVip->valuedouble;
     config->utilizadores = malloc(config->lotacaoMaxima * sizeof(pthread_t));
 
     for (int i = 0; i < config->lotacaoMaxima; i++)
-    {
+    { // limpeza preventiva
         config->utilizadores[i] = 0;
     }
 
@@ -199,6 +210,7 @@ void printConfig()
     printf("Probabilidade de saída do espaço: %f\n", config->probSaidaEspaco);
     printf("Probabilidade de saída do parque: %f\n", config->probSaidaParque);
     printf("Lotação máxima do parque: %i\n", config->lotacaoMaxima);
+    printf("Probabilidade de utilizador ser vip: %f\n", config->probVip);
     printf("Número de espaços: %i\n", config->numeroEspacos);
 
     for (int i = 0; i < config->numeroEspacos; i++)
@@ -248,12 +260,14 @@ void freeConfig()
         {
             pthread_mutex_destroy(&(espaco->mutexLotacaoFila));
             sem_destroy(&(espaco->semaforoFila));
+            sem_destroy(&(espaco->semaforoVips));
         }
 
         if (espaco->bCorrida)
         {
             pthread_mutex_destroy(&(espaco->mutexCorrida));
             sem_destroy(&(espaco->semaforoCorrida));
+            sem_destroy(&(espaco->semaforoCorridaSaida));
             free(espaco->corredores);
         }
     }

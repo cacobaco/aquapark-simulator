@@ -14,8 +14,10 @@ typedef struct
     int bFila; // flag indicadora de o espaço tem fila
     int lotacaoMaximaFila;
     int lotacaoFila;
+    int numVips;
     pthread_mutex_t mutexLotacaoFila;
     sem_t semaforoFila;
+    sem_t semaforoVips;
 
     int bDuracao; // flag indicadora de o espaço tem duração
     int duracao;
@@ -34,6 +36,7 @@ typedef struct
     double probEntradaEspaco;
     double probSaidaEspaco;
     double probSaidaParque;
+    double probVip;
     int lotacaoMaxima;
     pthread_t *utilizadores;
     int numeroEspacos;
@@ -43,7 +46,8 @@ typedef struct
 typedef struct
 {
     int id;
-    int pos; // posição no array de utilizadores, para controlo de threads
+    int pos;  // posição no array de utilizadores, para controlo de threads
+    int bVip; // flag indicadora de o utilizador ser vip
 } Utilizador;
 
 #endif
