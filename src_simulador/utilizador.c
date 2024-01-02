@@ -24,6 +24,7 @@ void criarUtilizador()
 {
     for (int i = 0; i < config->lotacaoMaxima; i++)
     {
+        printf("%i, %li\n", i, config->utilizadores[i]);
         if (config->utilizadores[i] == 0)
         {
             userId++;

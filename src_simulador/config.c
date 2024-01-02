@@ -178,6 +178,12 @@ void loadConfig()
     config->probSaidaParque = probSaidaParque->valuedouble;
     config->lotacaoMaxima = lotacaoMaxima->valueint;
     config->utilizadores = malloc(config->lotacaoMaxima * sizeof(pthread_t));
+
+    for (int i = 0; i < config->lotacaoMaxima; i++)
+    {
+        config->utilizadores[i] = 0;
+    }
+
     config->numeroEspacos = numeroEspacos;
     config->espacos = espacos;
 }
