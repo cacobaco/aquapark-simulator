@@ -159,6 +159,7 @@ void loadConfig()
             espacos[i].bCorrida = corrida->valueint;
             pthread_mutex_init(&(espacos[i].mutexCorrida), NULL);
             sem_init(&(espacos[i].semaforoCorrida), 0, 0);
+            sem_init(&(espacos[i].semaforoCorridaSaida), 0, espacos[i].lotacaoMaxima);
             espacos[i].corredores = malloc(espacos[i].lotacaoMaxima * sizeof(pthread_t));
         }
         else

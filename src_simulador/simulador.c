@@ -29,10 +29,10 @@ void main(int argc, char const *argv[])
         double probabilidade = tempoEsperado / (double)config->tempoMedioChegada;
         double random = rand() / (double)RAND_MAX;
 
-        printf("Tempo total: %d\n", tempoTotal);
-        printf("Tempo esperado: %d\n", tempoEsperado);
-        printf("Probabilidade: %f\n", probabilidade);
-        printf("Random: %f\n", random);
+        // printf("Tempo total: %d\n", tempoTotal);
+        // printf("Tempo esperado: %d\n", tempoEsperado);
+        // printf("Probabilidade: %f\n", probabilidade);
+        // printf("Random: %f\n", random);
 
         if (random <= probabilidade)
         {

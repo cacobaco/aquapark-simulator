@@ -23,6 +23,7 @@ typedef struct
     int bCorrida; // flag indicadora de o espaço ser uma corrida
     pthread_mutex_t mutexCorrida;
     sem_t semaforoCorrida;
+    sem_t semaforoCorridaSaida; // se fechar, corrida acabou
     int *corredores;
 } Espaco;
 
