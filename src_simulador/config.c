@@ -124,46 +124,46 @@ void loadConfig()
         cJSON *lotacaoMaximaFila = cJSON_GetObjectItemCaseSensitive(espacoJson, "lotacao_maxima_fila");
         if (cJSON_IsNumber(lotacaoMaximaFila))
         {
-            espacos[i].bTemFila = 1;
+            espacos[i].bFila = 1;
             espacos[i].lotacaoMaximaFila = lotacaoMaximaFila->valueint;
             espacos[i].lotacaoFila = 0;
             pthread_mutex_init(&(espacos[i].mutexLotacaoFila), NULL);
-            sem_init(&(espacos[i].semEntradaFila), 0, 0);
+            sem_init(&(espacos[i].semaforoFila), 0, 0);
         }
         else
         {
-            espacos[i].bTemFila = 0;
+            espacos[i].bFila = 0;
         }
 
         cJSON *duracao = cJSON_GetObjectItemCaseSensitive(espacoJson, "duracao");
         if (cJSON_IsNumber(duracao))
         {
-            espacos[i].bTemDuracao = 1;
+            espacos[i].bDuracao = 1;
             espacos[i].duracao = duracao->valueint;
         }
         else
         {
-            espacos[i].bTemDuracao = 0;
+            espacos[i].bDuracao = 0;
         }
 
-        cJSON *intervalo = cJSON_GetObjectItemCaseSensitive(espacoJson, "intervalo");
-        if (cJSON_IsNumber(intervalo))
+        cJSON *corrida = cJSON_GetObjectItemCaseSensitive(espacoJson, "corrida");
+        if (cJSON_IsBool(corrida))
         {
-            if (!espacos[i].bTemFila)
+            if (!espacos[i].bDuracao)
             {
-                printf("Ocorreu um erro ao carregar o intervalo do espaço %s: espaço não tem fila\n", espacos[i].nome);
+                printf("Ocorreu um erro ao carregar corrida do espaço %s: duração não definida\n", espacos[i].nome);
                 exit(1);
                 return;
             }
 
-            espacos[i].bTemIntervalo = 1;
-            espacos[i].intervalo = intervalo->valueint;
-            espacos[i].bAguardar = 0;
-            pthread_mutex_init(&(espacos[i].mutexAguardar), NULL);
+            espacos[i].bCorrida = corrida->valueint;
+            pthread_mutex_init(&(espacos[i].mutexCorrida), NULL);
+            sem_init(&(espacos[i].semaforoCorrida), 0, 0);
+            espacos[i].corredores = malloc(espacos[i].lotacaoMaxima * sizeof(pthread_t));
         }
         else
         {
-            espacos[i].bTemIntervalo = 0;
+            espacos[i].bCorrida = 0;
         }
 
         i++;
@@ -202,19 +202,23 @@ void printConfig()
         printf("\tNome: %s\n", espaco->nome);
         printf("\tLotação máxima: %i\n", espaco->lotacaoMaxima);
 
-        if (espaco->bTemFila)
+        if (espaco->bFila)
         {
             printf("\tLotação máxima da fila: %i\n", espaco->lotacaoMaximaFila);
         }
 
-        if (espaco->bTemDuracao)
+        if (espaco->bDuracao)
         {
             printf("\tDuração: %i\n", espaco->duracao);
         }
 
-        if (espaco->bTemIntervalo)
+        if (espaco->bCorrida)
         {
-            printf("\tIntervalo: %i\n", espaco->intervalo);
+            printf("\tCorrida: Sim\n");
+        }
+        else
+        {
+            printf("\tCorrida: Não\n");
         }
     }
 }
@@ -233,15 +237,17 @@ void freeConfig()
         free(espaco->nome);
         pthread_mutex_destroy(&(espaco->mutexLotacao));
 
-        if (espaco->bTemFila)
+        if (espaco->bFila)
         {
             pthread_mutex_destroy(&(espaco->mutexLotacaoFila));
-            sem_destroy(&(espaco->semEntradaFila));
+            sem_destroy(&(espaco->semaforoFila));
         }
 
-        if (espaco->bTemIntervalo)
+        if (espaco->bCorrida)
         {
-            pthread_mutex_destroy(&(espaco->mutexAguardar));
+            pthread_mutex_destroy(&(espaco->mutexCorrida));
+            sem_destroy(&(espaco->semaforoCorrida));
+            free(espaco->corredores);
         }
     }
 

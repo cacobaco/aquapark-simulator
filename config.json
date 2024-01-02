@@ -7,10 +7,31 @@
     "lotacao_maxima": 500,
     "espacos": [
         {
+            "nome": "wc",
+            "lotacao_maxima": 5,
+            "lotacao_maxima_fila": 50
+        },
+        {
+            "nome": "piscina",
+            "lotacao_maxima": 100
+        },
+        {
+            "nome": "rio lento",
+            "lotacao_maxima": 50,
+            "duracao": 5
+        },
+        {
             "nome": "tobogã branco",
-            "lotacao_maxima": 1,
-            "lotacao_maxima_fila": 4,
-            "duracao": 1
+            "lotacao_maxima": 5,
+            "lotacao_maxima_fila": 50,
+            "duracao": 10
+        },
+        {
+            "nome": "pista hotwheels",
+            "lotacao_maxima": 4,
+            "lotacao_maxima_fila": 80,
+            "duracao": 10,
+            "corrida": true
         }
     ]
 }

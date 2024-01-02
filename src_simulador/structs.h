@@ -11,19 +11,19 @@ typedef struct
     int lotacao;
     pthread_mutex_t mutexLotacao;
 
-    int bTemFila;
+    int bFila; // flag indicadora de o espaço tem fila
     int lotacaoMaximaFila;
     int lotacaoFila;
     pthread_mutex_t mutexLotacaoFila;
-    sem_t semEntradaFila;
+    sem_t semaforoFila;
 
-    int bTemDuracao;
+    int bDuracao; // flag indicadora de o espaço tem duração
     int duracao;
 
-    int bTemIntervalo;
-    int intervalo;
-    int bAguardar;                 // flag para os intervalos
-    pthread_mutex_t mutexAguardar; // mutex para os intervalos
+    int bCorrida; // flag indicadora de o espaço ser uma corrida
+    pthread_mutex_t mutexCorrida;
+    sem_t semaforoCorrida;
+    int *corredores;
 } Espaco;
 
 typedef struct

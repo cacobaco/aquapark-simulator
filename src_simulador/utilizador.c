@@ -77,7 +77,7 @@ void *comportamento(void *arg)
             {
                 while (1) // comportamento no espaço
                 {
-                    if (espaco->bTemDuracao)
+                    if (espaco->bDuracao)
                     {
                         sleep(espaco->duracao);
                         saiEspaco(utilizador, espaco);
@@ -113,16 +113,21 @@ void *comportamento(void *arg)
 }
 
 /*
- * função que simula a entrada e saída de um utilizador num espaço
+ * função que simula a entrada de um utilizador num espaço
  */
 int entraEspaco(Utilizador *utilizador, Espaco *espaco)
 {
     char buf[MAX_LEN];
 
-    if (espaco->bTemFila)
+    if (espaco->bFila)
     {
         pthread_mutex_lock(&(espaco->mutexLotacao));     // fechar trinco antes de aceder e modificar a lotação
         pthread_mutex_lock(&(espaco->mutexLotacaoFila)); // fechar trinco antes de aceder e modificar a lotação da fila
+
+        if (espaco->bCorrida)
+        {
+            pthread_mutex_lock(&(espaco->mutexCorrida)); // fechar trinco antes de aceder e modificar a corrida
+        }
 
         if (espaco->lotacaoFila <= 0 && espaco->lotacao < espaco->lotacaoMaxima)
         { // se não houver ninguém na fila e o espaço não estiver cheio, entra logo
@@ -132,7 +137,43 @@ int entraEspaco(Utilizador *utilizador, Espaco *espaco)
             writen(sock_fd, buf, strlen(buf));
 
             pthread_mutex_unlock(&(espaco->mutexLotacaoFila)); // abrir trinco depois de aceder e modificar a lotação da fila
-            pthread_mutex_unlock(&(espaco->mutexLotacao));     // abrir trinco depois de aceder e modificar a lotação
+
+            if (espaco->bCorrida)
+            {
+                espaco->corredores[espaco->lotacao - 1] = utilizador->id; // guardar id do utilizador no array de corredores
+
+                if (espaco->lotacao >= espaco->lotacaoMaxima)
+                { // se o espaço estiver cheio, começa a corrida
+                    snprintf(buf, MAX_LEN, "Corrida no espaço %s começou.\n", espaco->nome);
+                    writen(sock_fd, buf, strlen(buf));
+
+                    for (int i = 0; i < espaco->lotacaoMaxima; i++)
+                    { // baralhar corredores
+                        int temp = espaco->corredores[i];
+                        int random = rand() % espaco->lotacao;
+                        espaco->corredores[i] = espaco->corredores[random];
+                        espaco->corredores[random] = temp;
+                    }
+
+                    for (int i = 0; i < espaco->lotacaoMaxima - 1; i++)
+                    {
+                        sem_post(&(espaco->semaforoCorrida)); // abrir semáforo da corrida
+                    }
+
+                    pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
+                }
+                else
+                {
+                    pthread_mutex_unlock(&(espaco->mutexCorrida)); // abrir trinco depois de aceder e modificar a corrida
+                    pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
+
+                    sem_wait(&(espaco->semaforoCorrida)); // esperar que o semáforo da corrida abra
+                }
+            }
+            else
+            {
+                pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
+            }
 
             return 1;
         }
@@ -156,7 +197,7 @@ int entraEspaco(Utilizador *utilizador, Espaco *espaco)
 
         pthread_mutex_unlock(&(espaco->mutexLotacaoFila)); // abrir trinco depois de aceder e modificar a lotação da fila
 
-        sem_wait(&(espaco->semEntradaFila)); // esperar que o semáforo da fila abra
+        sem_wait(&(espaco->semaforoFila)); // esperar que o semáforo da fila abra
 
         pthread_mutex_lock(&(espaco->mutexLotacao));     // fechar trinco antes de aceder e modificar a lotação
         pthread_mutex_lock(&(espaco->mutexLotacaoFila)); // fechar trinco antes de aceder e modificar a lotação da fila
@@ -168,7 +209,43 @@ int entraEspaco(Utilizador *utilizador, Espaco *espaco)
         writen(sock_fd, buf, strlen(buf));
 
         pthread_mutex_unlock(&(espaco->mutexLotacaoFila)); // abrir trinco depois de aceder e modificar a lotação da fila
-        pthread_mutex_unlock(&(espaco->mutexLotacao));     // abrir trinco depois de aceder e modificar a lotação
+
+        if (espaco->bCorrida)
+        {
+            espaco->corredores[espaco->lotacao - 1] = utilizador->id; // guardar id do utilizador no array de corredores
+
+            if (espaco->lotacao >= espaco->lotacaoMaxima)
+            { // se o espaço estiver cheio, começa a corrida
+                snprintf(buf, MAX_LEN, "Corrida no espaço %s começou.\n", espaco->nome);
+                writen(sock_fd, buf, strlen(buf));
+
+                for (int i = 0; i < espaco->lotacaoMaxima; i++)
+                { // baralhar corredores
+                    int temp = espaco->corredores[i];
+                    int random = rand() % espaco->lotacao;
+                    espaco->corredores[i] = espaco->corredores[random];
+                    espaco->corredores[random] = temp;
+                }
+
+                for (int i = 0; i < espaco->lotacaoMaxima - 1; i++)
+                {
+                    sem_post(&(espaco->semaforoCorrida)); // abrir semáforo da corrida
+                }
+
+                pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
+            }
+            else
+            {
+                pthread_mutex_unlock(&(espaco->mutexCorrida)); // abrir trinco depois de aceder e modificar a corrida
+                pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
+
+                sem_wait(&(espaco->semaforoCorrida)); // esperar que o semáforo da corrida abra
+            }
+        }
+        else
+        {
+            pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
+        }
 
         return 1;
     }
@@ -190,11 +267,49 @@ int entraEspaco(Utilizador *utilizador, Espaco *espaco)
     snprintf(buf, MAX_LEN, "Utilizador %i entrou no espaço %s (%i/%i).\n", utilizador->id, espaco->nome, espaco->lotacao, espaco->lotacaoMaxima);
     writen(sock_fd, buf, strlen(buf));
 
-    pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
+    if (espaco->bCorrida)
+    {
+        espaco->corredores[espaco->lotacao - 1] = utilizador->id; // guardar id do utilizador no array de corredores
+
+        if (espaco->lotacao >= espaco->lotacaoMaxima)
+        { // se o espaço estiver cheio, começa a corrida
+            snprintf(buf, MAX_LEN, "Corrida no espaço %s começou.\n", espaco->nome);
+            writen(sock_fd, buf, strlen(buf));
+
+            for (int i = 0; i < espaco->lotacaoMaxima; i++)
+            { // baralhar corredores
+                int temp = espaco->corredores[i];
+                int random = rand() % espaco->lotacao;
+                espaco->corredores[i] = espaco->corredores[random];
+                espaco->corredores[random] = temp;
+            }
+
+            for (int i = 0; i < espaco->lotacaoMaxima - 1; i++)
+            {
+                sem_post(&(espaco->semaforoCorrida)); // abrir semáforo da corrida
+            }
+
+            pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
+        }
+        else
+        {
+            pthread_mutex_unlock(&(espaco->mutexCorrida)); // abrir trinco depois de aceder e modificar a corrida
+            pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
+
+            sem_wait(&(espaco->semaforoCorrida)); // esperar que o semáforo da corrida abra
+        }
+    }
+    else
+    {
+        pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
+    }
 
     return 1;
 }
 
+/*
+ * função que simula a saída de um utilizador de um espaço
+ */
 void saiEspaco(Utilizador *utilizador, Espaco *espaco)
 {
     pthread_mutex_lock(&(espaco->mutexLotacao)); // fechar trinco antes de modificar a lotação
@@ -202,28 +317,58 @@ void saiEspaco(Utilizador *utilizador, Espaco *espaco)
 
     char buf[MAX_LEN];
 
-    if (espaco->bTemDuracao)
+    if (espaco->bCorrida)
+    {
+        if (espaco->lotacao <= 0)
+        {
+            snprintf(buf, MAX_LEN, "Corrida no espaço %s acabou.\n", espaco->nome);
+            writen(sock_fd, buf, strlen(buf));
+
+            for (int i = 0; i < espaco->lotacaoMaxima; i++)
+            {
+                snprintf(buf, MAX_LEN, "Utilizador %i ficou em %i na corrida no espaço %s (%i/%i).\n", espaco->corredores[i], i, espaco->nome, espaco->lotacao, espaco->lotacaoMaxima);
+                writen(sock_fd, buf, strlen(buf));
+            }
+
+            for (int i = 0; i < espaco->lotacaoMaxima - 1; i++)
+            {
+                sem_post(&(espaco->semaforoCorrida)); // abrir semáforo da corrida
+            }
+
+            pthread_mutex_unlock(&(espaco->mutexCorrida)); // abrir trinco depois de aceder e modificar a corrida
+            pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
+        }
+        else
+        {
+            pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
+
+            sem_wait(&(espaco->semaforoCorrida)); // esperar que o semáforo da corrida abra
+        }
+    }
+    else if (espaco->bDuracao)
     {
         snprintf(buf, MAX_LEN, "Utilizador %i andou no espaço %s (%i/%i).\n", utilizador->id, espaco->nome, espaco->lotacao, espaco->lotacaoMaxima);
+        writen(sock_fd, buf, strlen(buf));
+
+        pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
     }
     else
     {
         snprintf(buf, MAX_LEN, "Utilizador %i saiu do espaço %s (%i/%i).\n", utilizador->id, espaco->nome, espaco->lotacao, espaco->lotacaoMaxima);
+        writen(sock_fd, buf, strlen(buf));
+
+        pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
     }
 
-    writen(sock_fd, buf, strlen(buf));
-
-    if (espaco->bTemFila)
+    if (espaco->bFila)
     {
         pthread_mutex_lock(&(espaco->mutexLotacaoFila)); // fechar trinco antes de aceder a lotação da fila
 
         if (espaco->lotacaoFila > 0)
         {
-            sem_post(&(espaco->semEntradaFila)); // abrir semáforo da fila
+            sem_post(&(espaco->semaforoFila)); // abrir semáforo da fila
         }
 
         pthread_mutex_unlock(&(espaco->mutexLotacaoFila)); // abrir trinco depois de aceder a lotação da fila
     }
-
-    pthread_mutex_unlock(&(espaco->mutexLotacao)); // abrir trinco depois de aceder e modificar a lotação
 }
