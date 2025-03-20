@@ -1,15 +1,34 @@
-# Projeto Parque Aquático - 3ª fase
+# AquaPark Simulator
 
-Foi-nos pedido que fizessemos um projeto que simule um parque de diversões, onde cada pessoa simulada pode visitar uma atração, aguardar em filas de espera, desistir da fila de espera, ter prioridade na fila, etc.
+AquaPark Simulator is a **C-based simulation of a water park**, focusing on **solving synchronization problems**. Visitors can join attraction queues, leave queues, gain priority access, and more. This project was developed as part of the **Operating Systems** course during the **2023/2024 academic year**, in the third and final year of the **Bachelor's Degree in Computer Engineering**.
 
-Este projeto é composto por 2 programas, o simulador e o monitor. O monitor serve para o utilizador iniciar a simulação e ver o que está a acontecer. O simulador a simulação em si e deverá correr em segundo plano. É estabelecida uma conecxão entre ambos para apresentar os eventos da simulação ao utilizador através do monitor.
+## Project Overview
+This project consists of two programs:
+- **Simulator**: Runs the simulation in the background, managing visitor interactions and queue dynamics.
+- **Monitor**: Provides a user interface to start the simulation and visualize real-time events happening in the water park.
 
-## Compilação
-1. `make`
+A connection is established between the **Simulator** and **Monitor** to display simulation events to the user.
 
-## Configuração
+## Compilation
+Run the following command to compile the project:
+```bash
+make
+```
 
+## Configuration
+The simulation parameters can be configured in the `config.json` file. The available settings include:
+- **Probabilities** – Adjust the likelihood of visitors entering/exiting queues.
+- **Timing Settings** – Define time intervals for visitor actions.
+- **Attractions** – Customize the available park attractions.
 
-## Execução
-1. `./monitor`
-2. `./simulador`
+## Execution
+Start the programs in the following order:
+```bash
+./monitor
+./simulador
+```
+
+## Team
+- **Leonardo Fernandes** (me)
+- **João Miguel**
+
